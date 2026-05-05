@@ -1,0 +1,46 @@
+﻿@model List<OnionApp.WebUI.Dtos.ReservationDtos.ResultReservationDto>
+@{
+    ViewData["Title"] = "Rezervasyon Operasyon";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    var active = Model.Where(x => x.Status == "Rented" || x.Status == "Pending").ToList();
+    var todayReturns = Model.Where(x => x.ReturnDate.HasValue && x.ReturnDate.Value.Date == DateTime.Today && x.Status != "Completed").ToList();
+}
+
+<h3>Aktif Kiralamalar (@active.Count)</h3>
+<table class="table table-bordered">
+    <tr><th>Müşteri</th><th>Araç</th><th>Durum</th><th>Planlanan İade</th><th>Teslim Et</th><th>İade Al</th></tr>
+    @foreach (var item in active)
+    {
+        <tr>
+            <td>@item.Name @item.Surname</td>
+            <td>@item.CarID</td>
+            <td>@item.Status</td>
+            <td>@item.ReturnDate?.ToString("dd.MM.yyyy")</td>
+            <td>
+                <form asp-action="CheckOut" method="post" class="d-flex gap-1">
+                    <input type="hidden" name="ReservationId" value="@item.Id" />
+                    <input type="number" name="StartKilometer" placeholder="KM" class="form-control" required />
+                    <input type="number" name="StartFuelLevel" placeholder="Yakıt(0-100)" class="form-control" required />
+                    <button class="btn btn-warning">Teslim Et</button>
+                </form>
+            </td>
+            <td>
+                <form asp-action="CheckIn" method="post" class="d-flex gap-1">
+                    <input type="hidden" name="ReservationId" value="@item.Id" />
+                    <input type="number" name="EndKilometer" placeholder="KM" class="form-control" required />
+                    <input type="number" name="EndFuelLevel" placeholder="Yakıt(0-100)" class="form-control" required />
+                    <input type="number" step="0.01" name="ExtraChargeAmount" placeholder="Ek Ücret" class="form-control" />
+                    <button class="btn btn-success">İade Al</button>
+                </form>
+            </td>
+        </tr>
+    }
+</table>
+
+<h3>Bugün İade Beklenenler (@todayReturns.Count)</h3>
+<ul>
+    @foreach (var item in todayReturns)
+    {
+        <li>#@item.Id - @item.Name @item.Surname - Araç:@item.CarID</li>
+    }
+</ul>

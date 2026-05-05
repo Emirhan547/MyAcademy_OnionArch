@@ -1,0 +1,98 @@
+﻿@using OnionApp.WebUI.Dtos.RentACarDtos
+@model RentACarListVM
+
+@{
+    ViewData["Title"] = "Araç Listesi";
+    Layout = "~/Views/UILayout/Index.cshtml";
+}
+
+<section class="ftco-section bg-light pb-0">
+    <div class="container">
+        <div class="row mb-4">
+
+            <!-- Öneriler -->
+            <div class="col-md-6">
+                <div class="p-4 bg-white rounded shadow-sm h-100">
+                    <h5 class="mb-2">🚀 Sana Özel Araçlar</h5>
+                    <p class="text-muted mb-2">Kullanıcı: @Model.UserId</p>
+
+                    @if (Model.SuggestedCars.Any())
+                    {
+                        <p class="mb-0">
+                            @string.Join(", ", Model.SuggestedCars)
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">Öneri bulunamadı</p>
+                    }
+                </div>
+            </div>
+
+            <!-- Fiyat -->
+            <div class="col-md-6">
+                <div class="p-4 bg-white rounded shadow-sm h-100">
+                    <h5 class="mb-2">
+                        💰 Ortalama Fiyat (@Model.City / @Model.Segment)
+                    </h5>
+
+                    <p class="mb-2">
+                        <strong>@Model.PriceBand</strong>
+                    </p>
+
+                    @if (Model.Opportunity)
+                    {
+                        <span class="badge badge-success">🔥 Fırsat Etiketi</span>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<section class="ftco-section bg-light">
+    <div class="container">
+        <div class="row">
+
+            @if (Model.Cars.Any())
+            {
+                foreach (var item in Model.Cars)
+                {
+                    <div class="col-md-4 mb-4">
+                        <div class="car-wrap rounded shadow-sm h-100">
+
+                            <div class="img rounded"
+                                 style="height:200px; background-size:cover; background-position:center;
+                                background-image:url('@item.CoverImageUrl');">
+                            </div>
+
+                            <div class="text p-3">
+                                <h5 class="mb-1">@item.Model</h5>
+
+                                <div class="d-flex mb-2">
+                                    <span class="text-muted">@item.Brand</span>
+                                    <span class="ml-auto font-weight-bold text-primary">₺---</span>
+                                </div>
+
+                                <div class="d-flex">
+                                    <a href="#" class="btn btn-primary btn-sm mr-2">Kirala</a>
+                                    <a href="#" class="btn btn-outline-secondary btn-sm">Detay</a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center">
+                    <p class="text-muted">Araç bulunamadı</p>
+                </div>
+            }
+
+        </div>
+    </div>
+</section>

@@ -1,0 +1,106 @@
+﻿:root {
+    --admin-bg: #f4f7fb;
+    --admin-surface: #ffffff;
+    --admin-primary: #4f46e5;
+    --admin-primary-soft: #eef0ff;
+    --admin-text: #1e293b;
+    --admin-muted: #64748b;
+    --admin-border: #e2e8f0;
+}
+
+body {
+    background: linear-gradient(160deg, #f8fafc 0%, #eef2ff 55%, #f1f5f9 100%);
+    color: var(--admin-text);
+}
+
+#page-topbar {
+    backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.9);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+    box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06);
+}
+
+.vertical-menu {
+    background: linear-gradient(180deg, #111827 0%, #1e293b 100%);
+    box-shadow: 8px 0 24px rgba(15, 23, 42, 0.2);
+}
+
+.navbar-brand-box,
+#sidebar-menu ul li a,
+.menu-title {
+    color: #e2e8f0 !important;
+}
+
+    #sidebar-menu ul li a:hover,
+    #sidebar-menu ul li.mm-active > a {
+        background: rgba(79, 70, 229, 0.25);
+        color: #fff !important;
+        border-left: 3px solid #a5b4fc;
+    }
+
+.page-content {
+    background-color: transparent;
+}
+
+.card {
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.card-title {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.card-subtitle {
+    color: var(--admin-muted);
+}
+
+.table {
+    border-collapse: separate;
+    border-spacing: 0 8px;
+}
+
+    .table thead th {
+        border: 0;
+        color: var(--admin-muted);
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+    }
+
+    .table tbody tr {
+        background: #fff;
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05);
+    }
+
+    .table td,
+    .table th {
+        vertical-align: middle;
+        border-top: none;
+    }
+
+.btn {
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.btn-outline-primary,
+.btn-outline-success,
+.btn-outline-danger,
+.btn-outline-dark {
+    border-width: 1.5px;
+}
+
+.form-control {
+    border-radius: 10px;
+    border-color: var(--admin-border);
+    min-height: 42px;
+}
+
+.footer {
+    background: transparent;
+    color: var(--admin-muted);
+}

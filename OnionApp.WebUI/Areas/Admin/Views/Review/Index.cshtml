@@ -1,0 +1,22 @@
+﻿@using OnionApp.WebUI.Dtos.ReviewDtos
+@model List<ResultReviewByCarIdDto>
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="page-content">
+    <div class="container-fluid">
+        <h4>Yorumlar (Araç: @ViewBag.carId)</h4>
+        <a class="btn btn-primary" href="/Admin/Review/CreateReview?carId=@ViewBag.carId">Yeni Yorum</a>
+        @foreach(var i in Model)
+        {
+    <div class="card mt-2">
+        <div class="card-body">
+            <h5>@i.CustomerName (@i.RaytingValue)</h5>
+            <p>@i.Comment</p>
+            <a href="/Admin/Review/UpdateReview?carId=@i.CarId&id=@i.Id">Güncelle</a>
+            <a href="/Admin/Review/DeleteReview?id=@i.Id&carId=@i.CarId">Sil</a>
+        </div>
+        </div>
+}
+</div>
+</div>

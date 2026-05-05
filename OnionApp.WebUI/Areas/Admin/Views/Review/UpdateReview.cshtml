@@ -1,0 +1,15 @@
+﻿@using OnionApp.WebUI.Dtos.ReviewDtos
+@model UpdateReviewDto
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+<form method="post">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="CarId" />
+    <input asp-for="CustomerName" class="form-control" />
+    <input asp-for="CustomerImage" class="form-control" />
+    <input asp-for="RaytingValue" class="form-control" />
+    <textarea asp-for="Comment" class="form-control"></textarea>
+    <input asp-for="ReviewDate" class="form-control" />
+    <button class="btn btn-success">Güncelle</button>
+</form>
