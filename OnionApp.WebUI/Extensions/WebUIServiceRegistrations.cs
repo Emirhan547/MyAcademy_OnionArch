@@ -23,7 +23,6 @@ using OnionApp.WebUI.Services.SocialMediaServices;
 using OnionApp.WebUI.Services.StatisticsServices;
 using OnionApp.WebUI.Services.TagCloudServices;
 using OnionApp.WebUI.Services.TestimonialServices;
-using OnionApp.WebUI.Services.UserInsightServices;
 
 namespace OnionApp.WebUI.Extensions
 {
@@ -56,7 +55,6 @@ namespace OnionApp.WebUI.Extensions
             services.AddScoped<IPricingService, PricingService>();
             services.AddScoped<ITagCloudService, TagCloudService>();
             services.AddScoped<ITestimonialService, TestimonialService>();
-            services.AddScoped<IUserInsightService, UserInsightService>();
         }
     }
 }

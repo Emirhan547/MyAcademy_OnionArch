@@ -16,13 +16,6 @@ using System.Text;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
-Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .Enrich.FromLogContext()
-    .Enrich.WithProperty("Application", "OnionApp.API")
-    .CreateLogger();
-
-builder.Host.UseSerilog();
 
 // Add services to the container.
 var jwtSection = builder.Configuration.GetSection("Jwt");

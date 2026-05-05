@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 using OnionApp.WebUI.Dtos.RentACarDtos;
 using OnionApp.WebUI.Models;
 using OnionApp.WebUI.Services.RentACarServices;
-using OnionApp.WebUI.Services.UserInsightServices;
 using System.Net.Http;
 using System.Text;
 
@@ -13,11 +12,10 @@ namespace UdemyCarBook.WebUI.Controllers
     public class RentACarListController : Controller
     {
         private readonly IRentACarService _rentACarService;
-        private readonly IUserInsightService _userInsightService;
-        public RentACarListController(IRentACarService rentACarService, IUserInsightService userInsightService)
+        public RentACarListController(IRentACarService rentACarService)
         {
             _rentACarService = rentACarService;
-            _userInsightService = userInsightService;
+           
         }
 
         public async Task<IActionResult> Index(int id, string userId = "demo-user-1", string city = "Istanbul", string carSegment = "SUV")
@@ -31,18 +29,15 @@ namespace UdemyCarBook.WebUI.Controllers
 
             var values = await _rentACarService.GetAvailableCarsAsync(id);
 
-            var pickupDate = DateOnly.FromDateTime(DateTime.UtcNow);
-            var returnDate = pickupDate.AddDays(3);
-
-            var recommendation = await _userInsightService.GetRecommendationsAsync(userId);
-            var priceSuggestion = await _userInsightService.GetPriceSuggestionAsync(city, carSegment, pickupDate, returnDate);
+           
 
             var vm = new RentACarListVM
             {
                 Cars = values ?? new List<FilterRentACarDto>(),
-                SuggestedCars = recommendation?.SuggestedCarIds ?? new List<string>(),
-                PriceBand = $"{priceSuggestion?.SuggestedMinPrice ?? 0} ₺ - {priceSuggestion?.SuggestedMaxPrice ?? 0} ₺",
-                Opportunity = priceSuggestion?.IsOpportunity ?? false,
+              
+                SuggestedCars = new List<string>(),
+                PriceBand = string.Empty,
+                Opportunity = false,
                 Segment = carSegment,
                 City = city,
                 UserId = userId
@@ -52,4 +47,3 @@ namespace UdemyCarBook.WebUI.Controllers
         }
     }
 }
-
