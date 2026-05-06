@@ -1,4 +1,5 @@
 ﻿using OnionApp.WebUI.Services.AboutServices;
+using OnionApp.WebUI.Services.AiServices;
 using OnionApp.WebUI.Services.AuthorServices;
 using OnionApp.WebUI.Services.AuthServices;
 using OnionApp.WebUI.Services.BannerServices;
@@ -55,6 +56,7 @@ namespace OnionApp.WebUI.Extensions
             services.AddScoped<IPricingService, PricingService>();
             services.AddScoped<ITagCloudService, TagCloudService>();
             services.AddScoped<ITestimonialService, TestimonialService>();
+            services.AddScoped<IArtificialIntelligenceWebService, ArtificialIntelligenceWebService>();
         }
     }
 }

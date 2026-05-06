@@ -1,6 +1,6 @@
 ﻿@model ReservationFormViewModel
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Rezervasyon";
     Layout = "~/Views/UILayout/Index.cshtml";
 }
 
@@ -9,48 +9,69 @@
    
     <form class="bg-light p-5 contact-form" method="post">
         <h3 class="alert alert-success">Araç Rezervasyon Formu</h3>
+        <div class="alert alert-info">
+            <strong>AI Rezervasyon Ön Kontrol:</strong> Formu doldurduktan sonra rezervasyon oluşturmadan önce teslim alma, iade, yaş/ehliyet ve operasyon notlarını AI ile kontrol edebilirsin.
+        </div>
         <br />
         <input type="hidden" asp-for="Reservation.CarId" class="form-control" placeholder="Almak İstediğiniz Araba">
-            <div class="form-group">
-                <input type="text" asp-for="Reservation.Name" class="form-control" placeholder="Adınız">
-                </div>
-                <div class="form-group">
-                    <input type="text" asp-for="Reservation.Surname" class="form-control" placeholder="Soyadınız">
-                    </div>
-                    <div class="form-group">
-                        <input type="text" asp-for="Reservation.Email" class="form-control" placeholder="Mail Adresiniz">
-                        </div>
-                        <div class="form-group">
-                            <input type="text" asp-for="Reservation.Phone" class="form-control" placeholder="Telefon Numaranız">
-                            </div>
-                            <div class="form-group">
-                                @Html.DropDownListFor(x=>x.Reservation.DropOffLocationId,Model.Locations,new{@class="form-control"})
-                            </div>
-                            <div class="form-group">
-                                @Html.DropDownListFor(x=>x.Reservation.PickUpLocationId,Model.Locations,new{@class="form-control"})
-                            </div>
-                            <div class="form-group">
-                                <label>Alış Tarihi</label>
-                                <input type="date" asp-for="Reservation.PickUpDate" class="form-control">
-                                </div>
-                                <div class="form-group">
-                                    <label>İade Tarihi</label>
-                                    <input type="date" asp-for="Reservation.ReturnDate" class="form-control">
-                                    </div>
-                            <div class="form-group">
-                                <input type="text" asp-for="Reservation.Age" class="form-control" placeholder="Yaşınız">
-                                </div>
-                                <div class="form-group">
-                                    <input type="text" asp-for="Reservation.DriverLicenseYear" class="form-control" placeholder="Ehliyet Yılınız">
-                                    </div>
-                                    <div class="form-group">
-                                        <textarea asp-for="Reservation.Description" id="" cols="30" rows="7" class="form-control" placeholder="Varsa Eklemek İstedikleriniz"></textarea>
-                                    </div>
-                                    <div class="form-group">
-                                        <input type="submit" value="Rezervasyonu Tamamla" class="btn btn-primary py-3 px-5">
-                                    </div>
-                                </form>
+        <div class="form-group">
+            <input type="text" asp-for="Reservation.Name" class="form-control" placeholder="Adınız">
+        </div>
+        <div class="form-group">
+            <input type="text" asp-for="Reservation.Surname" class="form-control" placeholder="Soyadınız">
+        </div>
+        <div class="form-group">
+            <input type="text" asp-for="Reservation.Email" class="form-control" placeholder="Mail Adresiniz">
+        </div>
+        <div class="form-group">
+            <input type="text" asp-for="Reservation.Phone" class="form-control" placeholder="Telefon Numaranız">
+        </div>
+        <div class="form-group">
+            @Html.DropDownListFor(x => x.Reservation.DropOffLocationId, Model.Locations, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.DropDownListFor(x => x.Reservation.PickUpLocationId, Model.Locations, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label>Alış Tarihi</label>
+            <input type="date" asp-for="Reservation.PickUpDate" class="form-control">
+        </div>
+        <div class="form-group">
+            <label>İade Tarihi</label>
+            <input type="date" asp-for="Reservation.ReturnDate" class="form-control">
+        </div>
+        <div class="form-group">
+            <input type="text" asp-for="Reservation.Age" class="form-control" placeholder="Yaşınız">
+        </div>
+        <div class="form-group">
+            <input type="text" asp-for="Reservation.DriverLicenseYear" class="form-control" placeholder="Ehliyet Yılınız">
+        </div>
+        <div class="form-group">
+            <textarea asp-for="Reservation.Description" cols="30" rows="7" class="form-control" placeholder="Varsa Eklemek İstedikleriniz"></textarea>
+        </div>
 
-                            </div>
+        @if (Model.AiResult?.Data != null)
+        {
+            <div class="alert alert-primary">
+                <div class="d-flex justify-content-between align-items-center">
+                    <strong>@Model.AiResult.Data.Title</strong>
+                    <small>@Model.AiResult.Data.Source</small>
+                </div>
+                <p class="mb-2 mt-2">@Model.AiResult.Data.Summary</p>
+                <ul class="mb-1">
+                    @foreach (var suggestion in Model.AiResult.Data.Suggestions)
+                    {
+                        <li>@suggestion</li>
+                    }
+                </ul>
+                <small>@Model.AiResult.Data.Disclaimer</small>
+            </div>
+        }
+        <div class="form-group d-flex flex-wrap">
+            <button type="submit" name="submitAction" value="create" class="btn btn-primary py-3 px-5 mr-2 mb-2">Rezervasyonu Tamamla</button>
+            <button type="submit" name="submitAction" value="ai-check" class="btn btn-outline-primary py-3 px-5 mb-2">AI Ön Kontrol Yap</button>
+        </div>
+    </form>
+</div>
 
  

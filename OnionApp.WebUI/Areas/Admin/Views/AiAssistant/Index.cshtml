@@ -1,0 +1,56 @@
+﻿@model OnionApp.WebUI.Dtos.AiDtos.AdminContentAiRequestDto
+@using OnionApp.WebUI.Base
+@using OnionApp.WebUI.Dtos.AiDtos
+@{
+    ViewData["Title"] = "AI Admin Asistanı";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    var result = ViewBag.AiResult as BaseResult<AiSuggestionDto>;
+}
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-flex align-items-center justify-content-between">
+            <h4 class="mb-0 font-size-18">AI Admin İçerik ve Operasyon Asistanı</h4>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">İçerik İsteği</h5>
+                <form method="post">
+                    <div class="form-group"><label>İçerik Türü</label><input asp-for="ContentType" class="form-control" placeholder="Blog, kampanya, sosyal medya..." /></div>
+                    <div class="form-group"><label>Hedef Kitle</label><input asp-for="TargetAudience" class="form-control" placeholder="Aileler, iş seyahati, öğrenciler..." /></div>
+                    <div class="form-group"><label>Anahtar Kelimeler</label><input asp-for="Keywords" class="form-control" placeholder="ekonomik araç, havalimanı teslim..." /></div>
+                    <div class="form-group"><label>Ton</label><input asp-for="ToneOfVoice" class="form-control" /></div>
+                    <button type="submit" class="btn btn-primary">AI Fikir Üret</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        @if (result?.Data != null)
+        {
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h4>@result.Data.Title</h4>
+                        <span class="badge badge-info">@result.Data.Source</span>
+                    </div>
+                    <p>@result.Data.Summary</p>
+                    <ul class="list-group">
+                        @foreach (var suggestion in result.Data.Suggestions)
+                        {
+                            <li class="list-group-item">@suggestion</li>
+                        }
+                    </ul>
+                    <small class="text-warning d-block mt-3">@result.Data.Disclaimer</small>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">Dashboard metriklerini kullanarak blog, kampanya ve operasyon önerisi üretmek için formu doldurun.</div>
+        }
+    </div>
+</div>

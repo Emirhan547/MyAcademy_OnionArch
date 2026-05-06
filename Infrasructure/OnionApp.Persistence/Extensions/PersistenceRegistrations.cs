@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OnionApp.Application.Contracts;
+using OnionApp.Application.Contracts.AI;
 using OnionApp.Domain.Entities;
+using OnionApp.Persistence.ArtificialIntelligence;
 using OnionApp.Persistence.Concrete;
 using OnionApp.Persistence.Context;
 namespace OnionApp.Persistence.Extensions
@@ -48,6 +50,8 @@ namespace OnionApp.Persistence.Extensions
           
             services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.Configure<AiSettings>(configuration.GetSection("AiSettings"));
+            services.AddHttpClient<IArtificialIntelligenceService, OpenAiCompatibleArtificialIntelligenceService>();
 
             return services;
 
