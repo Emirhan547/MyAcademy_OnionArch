@@ -1,49 +1,109 @@
-﻿@using OnionApp.WebUI.Dtos.RentACarDtos
+﻿﻿@using OnionApp.WebUI.Dtos.RentACarDtos
 @model RentACarListVM
 
 @{
     ViewData["Title"] = "Araç Listesi";
     Layout = "~/Views/UILayout/Index.cshtml";
+    var aiData = Model.AiResult?.Data;
 }
 
 <section class="ftco-section bg-light pb-0">
     <div class="container">
-        <div class="row mb-4">
+        <div class="row mb-4 align-items-stretch">
+            <div class="col-lg-7 mb-4 mb-lg-0">
+                <div class="p-4 bg-white rounded shadow-sm h-100 border-left border-primary">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <span class="subheading">CarBook AI</span>
+                            <h4 class="mb-1">Akıllı Araç Sıralama</h4>
+                            <p class="text-muted mb-0">Lokasyon ve kiralama amacına göre mevcut araç listesinden en uygun seçenekleri öne çıkarır.</p>
+                        </div>
+                        @if (aiData != null)
+                        {
+                            <span class="badge badge-info">@aiData.Source</span>
+                        }
+                    </div>
 
-            <!-- Öneriler -->
-            <div class="col-md-6">
-                <div class="p-4 bg-white rounded shadow-sm h-100">
-                    <h5 class="mb-2">🚀 Sana Özel Araçlar</h5>
-                    <p class="text-muted mb-2">Kullanıcı: @Model.UserId</p>
+          
+                    <form method="get" asp-action="Index" asp-controller="RentACarList" class="mb-3">
+                        <input type="hidden" name="id" value="@Model.LocationId" />
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label>Şehir</label>
+                                <input name="city" value="@Model.City" class="form-control" placeholder="Istanbul" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label>Segment</label>
+                                <input name="carSegment" value="@Model.Segment" class="form-control" placeholder="SUV, Sedan..." />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label>Yolcu</label>
+                                <input name="passengerCount" value="@Model.AiRequest.PassengerCount" type="number" min="1" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-8">
+                                <label>Kiralama amacı</label>
+                                <input name="tripPurpose" value="@Model.AiRequest.TripPurpose" class="form-control" placeholder="Aile tatili, iş seyahati, şehir içi..." />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label>Günlük bütçe</label>
+                                <input name="dailyBudget" value="@Model.AiRequest.DailyBudget" type="number" step="0.01" class="form-control" />
+                            </div>
+                        </div>
+                        <button class="btn btn-primary py-2 px-4" type="submit">Listeyi AI ile Sırala</button>
+                    </form>
 
-                    @if (Model.SuggestedCars.Any())
+                   
+                    @if (aiData != null)
                     {
-                        <p class="mb-0">
-                            @string.Join(", ", Model.SuggestedCars)
-                        </p>
+                        <div class="alert alert-primary mb-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong>@aiData.Title</strong>
+                                <small>@aiData.GeneratedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</small>
+                            </div>
+                            <p class="mb-2 mt-2">@aiData.Summary</p>
+                            <ul class="mb-1 pl-3">
+                                @foreach (var suggestion in aiData.Suggestions)
+                                {
+                                    <li>@suggestion</li>
+                                }
+                            </ul>
+                            <small>@aiData.Disclaimer</small>
+                        </div>
                     }
                     else
                     {
-                        <p class="text-muted mb-0">Öneri bulunamadı</p>
+                        
+                        <div class="alert alert-info mb-0">Uygun araç bulunduğunda AI, bu ekranda otomatik olarak öneri ve etiket üretir.</div>
                     }
                 </div>
             </div>
 
-            <!-- Fiyat -->
-            <div class="col-md-6">
+           
+            <div class="col-lg-5">
                 <div class="p-4 bg-white rounded shadow-sm h-100">
-                    <h5 class="mb-2">
-                        💰 Ortalama Fiyat (@Model.City / @Model.Segment)
-                    </h5>
-
-                    <p class="mb-2">
+                   
+                    <h5 class="mb-3">🚀 İş Akışı Özeti</h5>
+                    <div class="mb-3">
+                        <small class="text-muted d-block">Kullanıcı</small>
+                        <strong>@Model.UserId</strong>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted d-block">Ortalama Fiyat / Bütçe</small>
                         <strong>@Model.PriceBand</strong>
-                    </p>
-
-                    @if (Model.Opportunity)
-                    {
-                        <span class="badge badge-success">🔥 Fırsat Etiketi</span>
-                    }
+                   
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted d-block">AI Etiketleri</small>
+                        @if (Model.Opportunity)
+                        {
+                            <span class="badge badge-success mr-1">🔥 Fırsat</span>
+                        }
+                        <span class="badge badge-primary mr-1">@Model.Segment</span>
+                        <span class="badge badge-secondary">@Model.City</span>
+                    </div>
+                    <p class="text-muted mb-0">AI önerisi araç seçimini destekler; nihai fiyat ve uygunluk rezervasyon adımında kontrol edilmelidir.</p>
                 </div>
             </div>
 
@@ -60,25 +120,40 @@
             {
                 foreach (var item in Model.Cars)
                 {
+                    var isSuggested = Model.SuggestedCars.Any(x => x.Contains(item.Model, StringComparison.OrdinalIgnoreCase) || x.Contains(item.Brand, StringComparison.OrdinalIgnoreCase));
                     <div class="col-md-4 mb-4">
-                        <div class="car-wrap rounded shadow-sm h-100">
+                      
 
-                            <div class="img rounded"
-                                 style="height:200px; background-size:cover; background-position:center;
-                                background-image:url('@item.CoverImageUrl');">
-                            </div>
-
+                        <div class="car-wrap rounded shadow-sm h-100 @(isSuggested ? "border border-primary" : "")">
+                            <div class="img rounded" style="height:200px; background-size:cover; background-position:center; background-image:url('@item.CoverImageUrl');"></div>
                             <div class="text p-3">
                                 <h5 class="mb-1">@item.Model</h5>
 
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                   
+                                    @if (isSuggested)
+                                    {
+                                        <span class="badge badge-primary">AI Önerisi</span>
+                                    }
+                                </div>
                                 <div class="d-flex mb-2">
                                     <span class="text-muted">@item.Brand</span>
-                                    <span class="ml-auto font-weight-bold text-primary">₺---</span>
+                                   
+                                    <span class="ml-auto font-weight-bold text-primary">@(item.Amount > 0 ? $"₺{item.Amount:N0}" : "Fiyat sorunuz")</span>
+                                </div>
+                                <div class="mb-3">
+                                    <span class="badge badge-light mr-1">@Model.City</span>
+                                    <span class="badge badge-light mr-1">@Model.Segment</span>
+                                    @if (isSuggested)
+                                    {
+                                        <span class="badge badge-success">Karar destekli</span>
+                                    }
                                 </div>
 
                                 <div class="d-flex">
-                                    <a href="#" class="btn btn-primary btn-sm mr-2">Kirala</a>
-                                    <a href="#" class="btn btn-outline-secondary btn-sm">Detay</a>
+                                  
+                                    <a href="/Reservation/Index/@item.CarId" class="btn btn-primary btn-sm mr-2">Kirala</a>
+                                    <a href="/Car/CarDetail/@item.CarId" class="btn btn-outline-secondary btn-sm">Detay</a>
                                 </div>
                             </div>
 

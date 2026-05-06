@@ -1,4 +1,6 @@
-﻿using OnionApp.WebUI.Dtos.RentACarDtos;
+﻿using OnionApp.WebUI.Base;
+using OnionApp.WebUI.Dtos.AiDtos;
+using OnionApp.WebUI.Dtos.RentACarDtos;
 
 namespace OnionApp.WebUI.Models
 {
@@ -11,5 +13,8 @@ namespace OnionApp.WebUI.Models
         public string Segment { get; set; } = "";
         public string City { get; set; } = "";
         public string UserId { get; set; } = "";
+        public int LocationId { get; set; }
+        public SmartCarRankingAiRequestDto AiRequest { get; set; } = new();
+        public BaseResult<AiSuggestionDto>? AiResult { get; set; }
     }
 }

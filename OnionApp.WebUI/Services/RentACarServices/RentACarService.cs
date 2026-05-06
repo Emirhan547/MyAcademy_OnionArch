@@ -1,4 +1,5 @@
-﻿using OnionApp.WebUI.Dtos.RentACarDtos;
+﻿using OnionApp.WebUI.Base;
+using OnionApp.WebUI.Dtos.RentACarDtos;
 
 namespace OnionApp.WebUI.Services.RentACarServices
 {
@@ -20,9 +21,9 @@ namespace OnionApp.WebUI.Services.RentACarServices
                 if (!response.IsSuccessStatusCode)
                     return new List<FilterRentACarDto>();
 
-                var values = await response.Content.ReadFromJsonAsync<List<FilterRentACarDto>>();
+                var values = await response.Content.ReadFromJsonAsync<BaseResult<List<FilterRentACarDto>>>();
 
-                return values ?? new List<FilterRentACarDto>();
+                return values?.Data ?? new List<FilterRentACarDto>();
             }
             catch
             {

@@ -8,5 +8,6 @@ namespace OnionApp.WebUI.Services.AiServices
         Task<BaseResult<AiSuggestionDto>> GetCarAdvisorAsync(CarAdvisorAiRequestDto request);
         Task<BaseResult<AiSuggestionDto>> GetReservationAssistantAsync(ReservationAssistantAiRequestDto request);
         Task<BaseResult<AiSuggestionDto>> GetAdminContentAsync(AdminContentAiRequestDto request);
+        Task<BaseResult<AiSuggestionDto>> GetSmartCarRankingAsync(SmartCarRankingAiRequestDto request);
     }
 }

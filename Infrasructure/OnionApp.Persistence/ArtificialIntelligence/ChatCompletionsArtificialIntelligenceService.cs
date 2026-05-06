@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace OnionApp.Persistence.ArtificialIntelligence
 {
-    public sealed class OpenAiCompatibleArtificialIntelligenceService(HttpClient httpClient, IOptions<AiSettings> options) : IArtificialIntelligenceService
+    public sealed class ChatCompletionsArtificialIntelligenceService(HttpClient httpClient, IOptions<AiSettings> options) : IArtificialIntelligenceService
     {
         private readonly AiSettings _settings = options.Value;
 

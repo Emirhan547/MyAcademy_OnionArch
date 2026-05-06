@@ -21,7 +21,12 @@ namespace OnionApp.API.Controllers
             var result = await mediator.Send(query);
             return result.IsSuccessful ? Ok(result) : BadRequest(result);
         }
-
+        [HttpPost("smart-car-ranking")]
+        public async Task<IActionResult> GetSmartCarRanking(GetSmartCarRankingAiQuery query)
+        {
+            var result = await mediator.Send(query);
+            return result.IsSuccessful ? Ok(result) : BadRequest(result);
+        }
         [HttpPost("admin-content")]
         public async Task<IActionResult> GetAdminContent(GetAdminContentAiQuery query)
         {

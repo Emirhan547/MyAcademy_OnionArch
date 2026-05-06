@@ -51,7 +51,7 @@ namespace OnionApp.Persistence.Extensions
             services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.Configure<AiSettings>(configuration.GetSection("AiSettings"));
-            services.AddHttpClient<IArtificialIntelligenceService, OpenAiCompatibleArtificialIntelligenceService>();
+            services.AddHttpClient<IArtificialIntelligenceService, ChatCompletionsArtificialIntelligenceService>();
 
             return services;
 

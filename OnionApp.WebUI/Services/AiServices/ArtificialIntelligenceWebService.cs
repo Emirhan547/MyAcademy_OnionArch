@@ -12,7 +12,10 @@ namespace OnionApp.WebUI.Services.AiServices
         {
             return await PostAsync<CarAdvisorAiRequestDto>("ArtificialIntelligence/car-advisor", request);
         }
-
+        public async Task<BaseResult<AiSuggestionDto>> GetSmartCarRankingAsync(SmartCarRankingAiRequestDto request)
+        {
+            return await PostAsync<SmartCarRankingAiRequestDto>("ArtificialIntelligence/smart-car-ranking", request);
+        }
         public async Task<BaseResult<AiSuggestionDto>> GetReservationAssistantAsync(ReservationAssistantAiRequestDto request)
         {
             return await PostAsync<ReservationAssistantAiRequestDto>("ArtificialIntelligence/reservation-assistant", request);
