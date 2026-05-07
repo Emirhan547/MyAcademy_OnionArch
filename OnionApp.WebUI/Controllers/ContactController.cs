@@ -15,7 +15,8 @@ namespace OnionApp.WebUI.Controllers
         public async Task<IActionResult> Index(CreateContactDto create)
         {
             await _contactService.CreateAsync(create);
-            return RedirectToAction("Index","Default");
+            TempData["ContactSuccessMessage"] = "Mesajınız alındı. Kısa süre içinde ekibimiz dönüş sağlayacaktır.";
+            return RedirectToAction("Index", "Contact");
         }
     }
 }

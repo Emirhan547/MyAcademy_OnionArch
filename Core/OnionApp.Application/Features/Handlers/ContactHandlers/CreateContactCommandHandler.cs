@@ -4,12 +4,13 @@ using MediatR;
 using OnionApp.Application.Base;
 using OnionApp.Application.Contracts;
 using OnionApp.Application.Features.Commands.ContactCommands;
+using OnionApp.Application.Features.Events;
 using OnionApp.Domain.Entities;
 
 
 namespace OnionApp.Application.Features.Handlers.ContactHandlers
 {
-    public class CreateContactCommandHandler (IRepository<Contact> _repository,IUnitOfWork _unitOfWork,IValidator<CreateContactCommand> _validator): IRequestHandler<CreateContactCommand, BaseResult<object>>
+    public class CreateContactCommandHandler(IRepository<Contact> _repository, IUnitOfWork _unitOfWork, IValidator<CreateContactCommand> _validator, IIntegrationEventPublisher _eventPublisher) : IRequestHandler<CreateContactCommand, BaseResult<object>>
     {
         public async Task<BaseResult<object>> Handle(CreateContactCommand request, CancellationToken cancellationToken)
         {
@@ -22,8 +23,17 @@ namespace OnionApp.Application.Features.Handlers.ContactHandlers
             
             await _repository.CreateAsync(mapped);
             var uow = await _unitOfWork.SaveChangesAsync();
-            return uow ? BaseResult<object>.Success(true) : BaseResult<object>.Fail("Contact Eklenemedi");
-            
+            if (!uow)
+            {
+                return BaseResult<object>.Fail("Contact Eklenemedi");
+            }
+
+            await _eventPublisher.PublishAsync(
+                new ContactCreatedIntegrationEvent(mapped.Id, mapped.Name, mapped.Email, mapped.Subject, mapped.SendDate),
+                cancellationToken);
+
+            return BaseResult<object>.Success(true);
+
         }
     }
 }

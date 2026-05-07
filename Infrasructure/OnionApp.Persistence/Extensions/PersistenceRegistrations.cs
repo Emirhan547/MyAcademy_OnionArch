@@ -8,6 +8,7 @@ using OnionApp.Domain.Entities;
 using OnionApp.Persistence.ArtificialIntelligence;
 using OnionApp.Persistence.Concrete;
 using OnionApp.Persistence.Context;
+using OnionApp.Persistence.Messaging;
 namespace OnionApp.Persistence.Extensions
 {
     public static class PersistenceRegistrations
@@ -51,6 +52,8 @@ namespace OnionApp.Persistence.Extensions
             services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.Configure<AiSettings>(configuration.GetSection("AiSettings"));
+            services.Configure<RabbitMqSettings>(configuration.GetSection(RabbitMqSettings.SectionName));
+            services.AddScoped<IIntegrationEventPublisher, RabbitMqIntegrationEventPublisher>();
             services.AddHttpClient<IArtificialIntelligenceService, ChatCompletionsArtificialIntelligenceService>();
             services.AddScoped<ISmartPricingPredictionService, MlNetSmartPricingPredictionService>();
             return services;

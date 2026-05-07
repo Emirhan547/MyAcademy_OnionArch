@@ -13,6 +13,12 @@
 
             <div class="col-md-8 block-9 mb-md-5">
                 <form class="bg-light p-5 contact-form" method="post">
+                    @if (TempData["ContactSuccessMessage"] is string successMessage)
+                    {
+                        <div class="alert alert-success" role="alert">
+                            @successMessage
+                        </div>
+                    }
                     <div class="form-group">
                         <input type="text" class="form-control" placeholder="Adınız soyadınız" asp-for="Name">
                         </div>
