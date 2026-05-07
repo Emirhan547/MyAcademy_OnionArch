@@ -6,6 +6,7 @@
         public int LocationCount { get; set; }
         public int BrandCount { get; set; }
         public string AvgDaily { get; set; }
+        public int TodayReservationCount { get; set; }
     }
 }
 

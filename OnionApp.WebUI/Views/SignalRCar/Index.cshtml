@@ -15,13 +15,11 @@
                     <div class="card">
                         <script type="text/javascript">
                             $(document).ready(() => {
-                            var connection = new signalR.HubConnectionBuilder().withUrl("https://localhost:7188/CarHub").build();
+                            var connection = new signalR.HubConnectionBuilder().withUrl("https://localhost:7069/carhub").build();
                             $("#constatus").text(connection.state);
                             connection.start().then(() => {
                             $("#constatus").text(connection.state);
-                            setInterval(() => {
-                            connection.invoke("SendCarCount");
-                            }, 1000);
+                           
                             }).catch((err) => { console.log(err) });
 
                             connection.on("ReceiveCarCount", (value) => {

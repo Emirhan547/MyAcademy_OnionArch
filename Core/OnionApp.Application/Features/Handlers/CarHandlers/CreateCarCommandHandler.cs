@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace OnionApp.Application.Features.Handlers.CarHandlers
 {
-    public class CreateCarCommandHandler(IRepository<Car> repository, IValidator<CreateCarCommand> validator, IUnitOfWork unitOfWork) : IRequestHandler<CreateCarCommand, BaseResult<object>>
+    public class CreateCarCommandHandler(IRepository<Car> repository, IValidator<CreateCarCommand> validator, IUnitOfWork unitOfWork, ICarCountNotifier carCountNotifier) : IRequestHandler<CreateCarCommand, BaseResult<object>>
     {
         public async Task<BaseResult<object>> Handle(CreateCarCommand request, CancellationToken cancellationToken)
         {
@@ -28,7 +28,13 @@ namespace OnionApp.Application.Features.Handlers.CarHandlers
             await repository.CreateAsync(car);
 
             var isSuccess = await unitOfWork.SaveChangesAsync();
-            return isSuccess ? BaseResult<object>.Success("Araba eklendi") : BaseResult<object>.Fail("Araba eklenemedi");
+            if (isSuccess)
+            {
+                await carCountNotifier.NotifyCarCountAsync(cancellationToken);
+                return BaseResult<object>.Success("Araba eklendi");
+            }
+
+            return BaseResult<object>.Fail("Araba eklenemedi");
         }
     }
 }

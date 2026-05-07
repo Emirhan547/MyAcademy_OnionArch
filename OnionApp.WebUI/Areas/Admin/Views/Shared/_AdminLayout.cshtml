@@ -125,7 +125,7 @@
                                                     <button type="button" class="btn header-item noti-icon" id="page-header-notifications-dropdown"
                                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                         <i class="mdi mdi-bell"></i>
-                                                        <span class="badge badge-danger">0</span>
+                            <span id="notification-badge" class="badge badge-danger">0</span>
                                                     </button>
                                                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right p-0"
                                                          aria-labelledby="page-header-notifications-dropdown">
@@ -139,44 +139,9 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div data-simplebar style="max-height: 230px;">
-                                                            <a href="" class="text-reset notification-item">
-                                                                <div class="media">
-                                                                    <img src="~/Admin/vertical/assets/images/users/avatar-2.jpg"
-                                                                         class="mr-3 rounded-circle avatar-xs" alt="user-pic">
-                                                                        <div class="media-body">
-                                                                            <h6 class="mt-0 mb-1">Samuel Coverdale</h6>
-                                                                            <p class="font-size-12 mb-1">You have new follower on Instagram</p>
-                                                                            <p class="font-size-12 mb-0 text-muted"><i class="mdi mdi-clock-outline"></i> 2 min ago</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </a>
-                                                                <a href="" class="text-reset notification-item">
-                                                                    <div class="media">
-                                                                        <div class="avatar-xs mr-3">
-                                                                            <span class="avatar-title bg-success rounded-circle">
-                                                                                <i class="mdi mdi-cloud-download-outline"></i>
-                                                                            </span>
-                                                                        </div>
-                                                                        <div class="media-body">
-                                                                            <h6 class="mt-0 mb-1">Download Available !</h6>
-                                                                            <p class="font-size-12 mb-1">Latest version of admin is now available. Please download here.</p>
-                                                                            <p class="font-size-12 mb-0 text-muted"><i class="mdi mdi-clock-outline"></i> 4 hours ago</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </a>
-                                                                <a href="" class="text-reset notification-item">
-                                                                    <div class="media">
-                                                                        <img src="~/Admin/vertical/assets/images/users/avatar-3.jpg"
-                                                                             class="mr-3 rounded-circle avatar-xs" alt="user-pic">
-                                                                            <div class="media-body">
-                                                                                <h6 class="mt-0 mb-1">Victoria Mendis</h6>
-                                                                                <p class="font-size-12 mb-1">Just upgraded to premium account.</p>
-                                                                                <p class="font-size-12 mb-0 text-muted"><i class="mdi mdi-clock-outline"></i> 1 day ago</p>
-                                                                            </div>
-                                                                        </div>
-                                                                    </a>
-                                                                </div>
+                                                       <div id="notification-list" data-simplebar style="max-height: 230px;">
+                                                            <div class="p-3 text-muted" id="notification-empty">Henüz bildirim yok.</div>
+</div>
                                                                 <div class="p-2 border-top">
                                                                     <a class="btn btn-sm btn-light btn-block text-center" href="javascript:void(0)">
                                                                         <i class="mdi mdi-arrow-down-circle mr-1"></i> Load More..
@@ -302,5 +267,26 @@
 
                                             <!-- App js -->
                                             <script src="~/Admin/vertical/assets/js/theme.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+    <script>
+        (()=>{
+        const badge=document.getElementById('notification-badge');
+        const list=document.getElementById('notification-list');
+        const empty=document.getElementById('notification-empty');
+        const status=document.getElementById('reservation-hub-status');
+        const todayCount=document.getElementById('today-reservation-count');
+        const setStatus=(t)=>{ if(status) status.textContent=t; };
+        const renderItem=(n)=>`<a href="#" class="text-reset notification-item"><div class="media"><div class="avatar-xs mr-3"><span class="avatar-title bg-primary rounded-circle"><i class="mdi mdi-calendar"></i></span></div><div class="media-body"><h6 class="mt-0 mb-1">Yeni Rezervasyon #${n.reservationId}</h6><p class="font-size-12 mb-1">${n.fullName}</p><p class="font-size-12 mb-0 text-muted">${new Date(n.createdAtUtc).toLocaleString()}</p></div></div></a>`;
+        const connection=new signalR.HubConnectionBuilder().withUrl('/reservationhub').withAutomaticReconnect().build();
+        connection.on('ReceiveReservationCount', c=>{ if(badge) badge.textContent=c; });
+        connection.on('ReceiveReservationCreated', n=>{ if(empty) empty.remove(); if(list) list.insertAdjacentHTML('afterbegin', renderItem(n)); if(todayCount){ const cur=parseInt((todayCount.textContent||'0').replace(/\D/g,''))||0; todayCount.textContent='# '+(cur+1);} });
+        connection.onreconnecting(()=>setStatus('Yeniden bağlanıyor...'));
+        connection.onreconnected(()=>setStatus('Bağlı'));
+        connection.onclose(()=>setStatus('Bağlantı kapalı'));
+        fetch('/Admin/Reservation/RecentNotifications').then(r=>r.ok?r.json():[]).then(items=>{ if(items.length){ if(empty) empty.remove(); items.forEach(i=>list.insertAdjacentHTML('beforeend', renderItem(i)));}});
+        fetch('/Admin/Reservation/UnreadCount').then(r=>r.ok?r.json():{count:0}).then(x=>{ if(badge) badge.textContent=x.count??0;});
+        connection.start().then(()=>setStatus('Bağlı')).catch(()=>setStatus('Bağlanamadı'));
+        })();
+    </script>
 </body>
 </html>

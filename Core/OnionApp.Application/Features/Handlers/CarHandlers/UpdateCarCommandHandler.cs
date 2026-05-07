@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace OnionApp.Application.Features.Handlers.CarHandlers
 {
-    public class UpdateCarCommandHandler(IRepository<Car> repository, IUnitOfWork unitOfWork, IValidator<UpdateCarCommand> validator) : IRequestHandler<UpdateCarCommand, BaseResult<object>>
+    public class UpdateCarCommandHandler(IRepository<Car> repository, IUnitOfWork unitOfWork, IValidator<UpdateCarCommand> validator, ICarCountNotifier carCountNotifier) : IRequestHandler<UpdateCarCommand, BaseResult<object>>
     {
         public async Task<BaseResult<object>> Handle(UpdateCarCommand request, CancellationToken cancellationToken)
         {
@@ -30,7 +30,13 @@ namespace OnionApp.Application.Features.Handlers.CarHandlers
             request.Adapt(car);
             repository.Update(car);
             var isSuccess = await unitOfWork.SaveChangesAsync();
-            return isSuccess ? BaseResult<object>.Success() : BaseResult<object>.Fail("Araba güncellenemedi");
+            if (isSuccess)
+            {
+                await carCountNotifier.NotifyCarCountAsync(cancellationToken);
+                return BaseResult<object>.Success();
+            }
+
+            return BaseResult<object>.Fail("Araba güncellenemedi");
         }
     }
 }

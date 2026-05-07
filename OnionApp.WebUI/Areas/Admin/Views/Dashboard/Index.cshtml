@@ -1,4 +1,5 @@
-﻿@using OnionApp.WebUI.Models
+﻿@inject IConfiguration Configuration
+@using OnionApp.WebUI.Models
 @model DashboardViewModel
 @{
     ViewData["Title"] = "Dashboard";
@@ -6,8 +7,11 @@
     var fuelTotal = Model.ElectricCount + Model.GasOrDieselCount;
     var electricRate = fuelTotal == 0 ? 0 : Math.Round((double)Model.ElectricCount / fuelTotal * 100, 1);
     var autoRate = Model.CarCount == 0 ? 0 : Math.Round((double)Model.AutoTransmissionCount / Model.CarCount * 100, 1);
+    var carHubUrl = Configuration["ApiSettings:SignalR:CarHubUrl"] ?? throw new InvalidOperationException("ApiSettings:SignalR:CarHubUrl is required.");
+    var jwtToken = User.FindFirst("carbooktoken")?.Value ?? string.Empty;
 }
 <script src="~/Admin/plugins/chart-js/chart.min.js"></script>
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
 <div class="page-content">
     <div class="container-fluid">
         <div class="row mb-4">
@@ -19,7 +23,7 @@
                             <p class="mb-0">Filo, fiyat ve içerik performansı canlı istatistiklerle anlık takip edilir.</p>
                         </div>
                         <div class="text-end mt-3 mt-md-0">
-                            <h3 class="mb-0">@Model.CarCount Araç</h3>
+                            <h3 class="mb-0"><span id="liveCarCount">@Model.CarCount</span> Araç</h3>
                             <small>@Model.BrandCount Marka • @Model.LocationCount Lokasyon</small>
                         </div>
                     </div>
@@ -28,81 +32,19 @@
         </div>
         @await Component.InvokeAsync("_AdminDashboardStatisticsComponentPartial")
         <div class="row mt-2">
-            <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-body">
-                        <h4 class="card-title">Gelir Trendi (Dinamik Ortalamalar)</h4>
-                        <canvas id="revenueTrend" height="110"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h4 class="card-title">Operasyon Özeti</h4>
-                        <p class="mb-1">Otomatik Vites Oranı: <strong>%@autoRate</strong></p>
-                        <div class="progress mb-3"><div class="progress-bar bg-primary" style="width:@autoRate%"></div></div>
-                        <p class="mb-1">Elektrikli Filo Oranı: <strong>%@electricRate</strong></p>
-                        <div class="progress mb-3"><div class="progress-bar bg-success" style="width:@electricRate%"></div></div>
-                        <p class="mb-0 text-muted">1000 km altı araç sayısı: <strong>@Model.UnderThousandKmCount</strong></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row mt-2">
-            <div class="col-lg-6">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h4 class="card-title">İçerik ve Marka İçgörüleri</h4>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item px-0"><strong>En Güçlü Marka:</strong> @Model.TopBrand</li>
-                            <li class="list-group-item px-0"><strong>En Çok Yorum Alan Blog:</strong> @Model.MostCommentedBlog</li>
-                            <li class="list-group-item px-0"><strong>Minimum Günlük Fiyatlı Araç:</strong> @Model.MinDailyPriceCar</li>
-                            <li class="list-group-item px-0"><strong>Maksimum Günlük Fiyatlı Araç:</strong> @Model.MaxDailyPriceCar</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h4 class="card-title">İçerik Yoğunluğu</h4>
-                        <canvas id="contentMix" height="180"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row mt-2">
-            @await Component.InvokeAsync("_AdminDashboardCarPricingListComponentPartial")
-            @await Component.InvokeAsync("_AdminDashboardBlogListComponentPartial")
+            <div class="col-lg-8"><div class="card"><div class="card-body"><h4 class="card-title">Gelir Trendi (Dinamik Ortalamalar)</h4><canvas id="revenueTrend" height="110"></canvas></div></div></div>
+            <div class="col-lg-4"><div class="card h-100"><div class="card-body"><h4 class="card-title">Operasyon Özeti</h4><p class="mb-1">Otomatik Vites Oranı: <strong>%@autoRate</strong></p><div class="progress mb-3"><div class="progress-bar bg-primary" style="width:@autoRate%"></div></div><p class="mb-1">Elektrikli Filo Oranı: <strong>%@electricRate</strong></p><div class="progress mb-3"><div class="progress-bar bg-success" style="width:@electricRate%"></div></div><p class="mb-0 text-muted">1000 km altı araç sayısı: <strong>@Model.UnderThousandKmCount</strong></p></div></div></div>
         </div>
     </div>
 </div>
 <script>
-    new Chart(document.getElementById('revenueTrend'), {
-        type: 'line',
-        data: {
-            labels: ['Günlük', 'Haftalık', 'Aylık'],
-            datasets: [{
-                label: 'Ortalama Kiralama Tutarı (₺)',
-                data: [@Model.AvgDailyPrice, @Model.AvgWeeklyPrice, @Model.AvgMonthlyPrice],
-                borderColor: '#4f46e5',
-                backgroundColor: 'rgba(79,70,229,.15)',
-                tension: .35,
-                fill: true
-            }]
-        }
-    });
+    const connection = new signalR.HubConnectionBuilder()
+         .withUrl("@carHubUrl", { accessTokenFactory: () => "@jwtToken" })
+         .withAutomaticReconnect()
+         .build();
 
-    new Chart(document.getElementById('contentMix'), {
-        type: 'doughnut',
-        data: {
-            labels: ['Blog', 'Yazar', 'Marka', 'Lokasyon'],
-            datasets: [{
-                data: [@Model.BlogCount, @Model.AuthorCount, @Model.BrandCount, @Model.LocationCount],
-                backgroundColor: ['#4f46e5', '#06b6d4', '#f59e0b', '#10b981']
-            }]
-        }
+    connection.on("ReceiveCarCount", (value) => {
+         document.getElementById("liveCarCount").textContent = value;
     });
+    connection.start().catch((err) => console.error(err));
 </script>

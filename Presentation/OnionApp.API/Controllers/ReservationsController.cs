@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OnionApp.API.Security;
+using OnionApp.API.Services;
 using OnionApp.Application.Features.Commands.ReservationCommands;
 using OnionApp.Application.Features.Queries.ReservationQueries;
 
@@ -10,8 +11,24 @@ namespace OnionApp.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ReservationsController(IMediator mediator) : ControllerBase
+    public class ReservationsController(IMediator mediator, IReservationNotifier notifier) : ControllerBase
     {
+        [HttpGet("notifications/unread-count")]
+        [Authorize(Policy = PolicyNames.EmployeeOnly)]
+        public async Task<IActionResult> GetUnreadCount()
+        {
+            var count = await notifier.GetUnreadCountAsync();
+            return Ok(new { Count = count });
+        }
+
+        [HttpGet("notifications/recent")]
+        [Authorize(Policy = PolicyNames.EmployeeOnly)]
+        public async Task<IActionResult> GetRecentNotifications()
+        {
+            var items = await notifier.GetRecentNotificationsAsync();
+            return Ok(items);
+        }
+
         [HttpGet]
         public async Task<IActionResult> Get()
         {

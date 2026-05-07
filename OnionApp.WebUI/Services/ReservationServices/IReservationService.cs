@@ -9,5 +9,8 @@ namespace OnionApp.WebUI.Services.ReservationServices
         Task<BaseResult<List<ResultReservationDto>>> GetAllAsync();
         Task<bool> CheckOutAsync(UpdateReservationCheckOutDto dto);
         Task<bool> CheckInAsync(UpdateReservationCheckInDto dto);
+        Task<int> GetTodayReservationCountAsync();
+        Task<int> GetUnreadCountAsync();
+        Task<List<object>> GetRecentNotificationsAsync();
     }
 }

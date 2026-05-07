@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using OnionApp.API.Hubs;
 using OnionApp.API.Security;
+using OnionApp.API.Services;
+using OnionApp.Application.Contracts;
 using OnionApp.Application.Extensions;
 using OnionApp.Application.Tools;
 using OnionApp.Domain.Entities;
@@ -42,6 +44,8 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     options.SuppressModelStateInvalidFilter = true;
 });
 builder.Services.AddSignalR();
+builder.Services.AddScoped<ICarCountNotifier, CarCountNotifier>();
+builder.Services.AddSingleton<IReservationNotifier, ReservationNotifier>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>
 {
     opt.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
@@ -55,6 +59,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidateIssuerSigningKey = true,
         ValidateIssuer = true,
         ValidateAudience = true
+    };
+    opt.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrWhiteSpace(accessToken) && path.StartsWithSegments("/carhub"))
+            {
+                context.Token = accessToken;
+            }
+
+            return Task.CompletedTask;
+        }
     };
 });
 builder.Services.AddAuthorization(options =>

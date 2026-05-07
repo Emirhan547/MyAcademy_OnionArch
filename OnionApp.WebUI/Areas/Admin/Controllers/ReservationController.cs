@@ -19,7 +19,19 @@ namespace OnionApp.WebUI.Areas.Admin.Controllers
             await _service.CheckOutAsync(dto);
             return RedirectToAction(nameof(Index));
         }
+        [HttpGet]
+        public async Task<IActionResult> UnreadCount()
+        {
+            var count = await _service.GetUnreadCountAsync();
+            return Json(new { count });
+        }
 
+        [HttpGet]
+        public async Task<IActionResult> RecentNotifications()
+        {
+            var items = await _service.GetRecentNotificationsAsync();
+            return Json(items);
+        }
         [HttpPost]
         public async Task<IActionResult> CheckIn(UpdateReservationCheckInDto dto)
         {

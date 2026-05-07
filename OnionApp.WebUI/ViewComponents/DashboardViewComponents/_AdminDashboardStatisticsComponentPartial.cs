@@ -5,7 +5,7 @@ using OnionApp.WebUI.Dtos.DashboardStatsDtos;
 
 namespace OnionApp.WebUI.ViewComponents.DashboardViewComponents
 {
-    public class _AdminDashboardStatisticsComponentPartial(IStatisticsService _service) : ViewComponent
+    public class _AdminDashboardStatisticsComponentPartial(IStatisticsService _service, OnionApp.WebUI.Services.ReservationServices.IReservationService reservationService) : ViewComponent
     {
         public async Task<IViewComponentResult> InvokeAsync()
         {
@@ -28,6 +28,7 @@ namespace OnionApp.WebUI.ViewComponents.DashboardViewComponents
             var avgDaily = await _service.GetAvgRentPriceForDaily();
             if (avgDaily.IsSuccessful)
                 model.AvgDaily = avgDaily.Data.ToString("0.00");
+            model.TodayReservationCount = await reservationService.GetTodayReservationCountAsync();
 
             // random değerleri ViewBag'de tutabiliriz (UI işi)
             ViewBag.CarRandom = random.Next(0, 101);

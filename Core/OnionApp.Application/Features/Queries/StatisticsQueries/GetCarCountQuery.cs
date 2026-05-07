@@ -10,5 +10,6 @@ namespace OnionApp.Application.Features.Queries.StatisticsQueries
 {
     public class GetCarCountQuery:IRequest<BaseResult<int>> 
     {
+       
     }
 }

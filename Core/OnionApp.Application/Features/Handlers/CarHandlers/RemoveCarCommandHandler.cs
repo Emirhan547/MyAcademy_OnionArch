@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace OnionApp.Application.Features.Handlers.CarHandlers
 {
-    public class RemoveCarCommandHandler(IRepository<Car> repository, IUnitOfWork unitOfWork) : IRequestHandler<RemoveCarCommand, BaseResult<object>>
+    public class RemoveCarCommandHandler(IRepository<Car> repository, IUnitOfWork unitOfWork, ICarCountNotifier carCountNotifier) : IRequestHandler<RemoveCarCommand, BaseResult<object>>
     {
         public async Task<BaseResult<object>> Handle(RemoveCarCommand request, CancellationToken cancellationToken)
         {
@@ -23,9 +23,13 @@ namespace OnionApp.Application.Features.Handlers.CarHandlers
             }
             repository.Delete(car);
             var isSuccess = await unitOfWork.SaveChangesAsync();
-            return isSuccess
-                ? BaseResult<object>.Success("Araba başarıyla silindi")
-                : BaseResult<object>.Fail("Araba silinemedi");
+            if (isSuccess)
+            {
+                await carCountNotifier.NotifyCarCountAsync(cancellationToken);
+                return BaseResult<object>.Success("Araba başarıyla silindi");
+            }
+
+            return BaseResult<object>.Fail("Araba silinemedi");
         }
     }
 }

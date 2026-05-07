@@ -100,5 +100,24 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-6 col-xl-3">
+            <div class="card bg-dark border-dark">
+                <div class="card-body">
+                    <div class="mb-4">
+                        <span class="badge badge-soft-light float-right">Canlı</span>
+                        <h5 class="card-title mb-0 text-white">Bugün Gelen Rezervasyon</h5>
+                    </div>
+                    <div class="row d-flex align-items-center mb-4">
+                        <div class="col-8">
+                            <h2 id="today-reservation-count" class="d-flex align-items-center text-white mb-0"># @Model.TodayReservationCount</h2>
+                        </div>
+                        <div class="col-4 text-right">
+                            <span id="reservation-hub-status" class="text-white-50">Bağlanıyor...</span>
+                        </div>
+                    </div>
+                    <small class="text-white-50">SignalR bağlantı durumuna göre otomatik güncellenir.</small>
+                </div>
+            </div>
     </div>
+</div>
 </div>
