@@ -52,7 +52,7 @@ namespace OnionApp.Persistence.Extensions
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.Configure<AiSettings>(configuration.GetSection("AiSettings"));
             services.AddHttpClient<IArtificialIntelligenceService, ChatCompletionsArtificialIntelligenceService>();
-
+            services.AddScoped<ISmartPricingPredictionService, MlNetSmartPricingPredictionService>();
             return services;
 
         }

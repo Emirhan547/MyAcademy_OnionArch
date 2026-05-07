@@ -495,6 +495,7 @@ namespace OnionApp.Persistence.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("CarId")
@@ -766,6 +767,7 @@ namespace OnionApp.Persistence.Migrations
                         .HasColumnType("time");
 
                     b.Property<decimal>("TotalPrice")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
@@ -823,6 +825,7 @@ namespace OnionApp.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("ExtraChargeAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Name")

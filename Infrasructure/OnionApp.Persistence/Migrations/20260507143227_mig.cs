@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace OnionApp.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class mig1 : Migration
+    public partial class mig : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -479,7 +479,7 @@ namespace OnionApp.Persistence.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CarId = table.Column<int>(type: "int", nullable: false),
                     PricingId = table.Column<int>(type: "int", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -514,7 +514,7 @@ namespace OnionApp.Persistence.Migrations
                     CustomerId = table.Column<int>(type: "int", nullable: false),
                     PickUpDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DropOffDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -585,7 +585,7 @@ namespace OnionApp.Persistence.Migrations
                     EndFuelLevel = table.Column<int>(type: "int", nullable: true),
                     CheckOutDamageNote = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CheckInDamageNote = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ExtraChargeAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ExtraChargeAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     CheckOutAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CheckInAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },

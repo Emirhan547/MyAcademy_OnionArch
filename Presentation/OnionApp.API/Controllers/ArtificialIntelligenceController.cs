@@ -14,6 +14,12 @@ namespace OnionApp.API.Controllers
             var result = await mediator.Send(query);
             return result.IsSuccessful ? Ok(result) : BadRequest(result);
         }
+        [HttpPost("smart-pricing")]
+        public async Task<IActionResult> GetSmartPricing(GetSmartPricingAiQuery query)
+        {
+            var result = await mediator.Send(query);
+            return result.IsSuccessful ? Ok(result) : BadRequest(result);
+        }
 
         [HttpPost("reservation-assistant")]
         public async Task<IActionResult> GetReservationAssistant(GetReservationAssistantAiQuery query)

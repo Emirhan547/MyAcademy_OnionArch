@@ -5,6 +5,8 @@
     ViewData["Title"] = "AI Admin Asistanı";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
     var result = ViewBag.AiResult as BaseResult<AiSuggestionDto>;
+    var smartPricingRequest = ViewBag.SmartPricingRequest as SmartPricingAiRequestDto ?? new SmartPricingAiRequestDto();
+    var smartPricingResult = ViewBag.SmartPricingResult as BaseResult<SmartPricingDto>;
 }
 <div class="row">
     <div class="col-12">
@@ -15,10 +17,10 @@
 </div>
 <div class="row">
     <div class="col-lg-5">
-        <div class="card">
+        <div class="card mb-3">
             <div class="card-body">
                 <h5 class="card-title">İçerik İsteği</h5>
-                <form method="post">
+                <form method="post" asp-action="Index">
                     <div class="form-group"><label>İçerik Türü</label><input asp-for="ContentType" class="form-control" placeholder="Blog, kampanya, sosyal medya..." /></div>
                     <div class="form-group"><label>Hedef Kitle</label><input asp-for="TargetAudience" class="form-control" placeholder="Aileler, iş seyahati, öğrenciler..." /></div>
                     <div class="form-group"><label>Anahtar Kelimeler</label><input asp-for="Keywords" class="form-control" placeholder="ekonomik araç, havalimanı teslim..." /></div>
@@ -27,8 +29,38 @@
                 </form>
             </div>
         </div>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Smart Pricing (ML.NET)</h5>
+                <form method="post" asp-action="SmartPricing">
+                    <div class="form-group"><label>Araç Tipi</label><input name="CarType" value="@smartPricingRequest.CarType" class="form-control" placeholder="SUV, Sedan, Hatchback..." /></div>
+                    <div class="form-group"><label>Sezon</label><input name="Season" value="@smartPricingRequest.Season" class="form-control" placeholder="low / normal / high" /></div>
+                    <div class="form-group"><label>Lokasyon</label><input name="Location" value="@smartPricingRequest.Location" class="form-control" placeholder="istanbul, ankara, izmir" /></div>
+                    <div class="form-group"><label>KM</label><input name="Km" type="number" value="@smartPricingRequest.Km" class="form-control" /></div>
+                    <div class="form-group"><label>Yakıt</label><input name="Fuel" value="@smartPricingRequest.Fuel" class="form-control" placeholder="benzin, dizel, elektrik" /></div>
+                    <div class="form-group"><label>Geçmiş Talep Endeksi (0-100)</label><input name="HistoricalDemandIndex" type="number" min="0" max="100" value="@smartPricingRequest.HistoricalDemandIndex" class="form-control" /></div>
+                    <button type="submit" class="btn btn-success">Smart Fiyat Öner</button>
+                </form>
+            </div>
+        </div>
     </div>
     <div class="col-lg-7">
+        @if (smartPricingResult?.Data != null)
+        {
+            <div class="card mb-3 border-success">
+                <div class="card-body">
+                    <h4>@smartPricingResult.Data.Title</h4>
+                    <h3 class="text-success">@smartPricingResult.Data.SuggestedDailyPrice @smartPricingResult.Data.Currency / Gün</h3>
+                    <p>@smartPricingResult.Data.Summary</p>
+                    <ul class="list-group">
+                        @foreach (var factor in smartPricingResult.Data.PriceFactors)
+                        {
+                            <li class="list-group-item">@factor</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
         @if (result?.Data != null)
         {
             <div class="card">
@@ -48,9 +80,9 @@
                 </div>
             </div>
         }
-        else
+        else if (smartPricingResult?.Data == null)
         {
-            <div class="alert alert-info">Dashboard metriklerini kullanarak blog, kampanya ve operasyon önerisi üretmek için formu doldurun.</div>
+            <div class="alert alert-info">Dashboard metriklerini kullanarak blog, kampanya ve operasyon önerisi üretmek veya ML.NET smart pricing hesaplamak için formu doldurun.</div>
         }
     </div>
 </div>

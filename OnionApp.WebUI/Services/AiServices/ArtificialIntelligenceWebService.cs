@@ -10,27 +10,31 @@ namespace OnionApp.WebUI.Services.AiServices
 
         public async Task<BaseResult<AiSuggestionDto>> GetCarAdvisorAsync(CarAdvisorAiRequestDto request)
         {
-            return await PostAsync<CarAdvisorAiRequestDto>("ArtificialIntelligence/car-advisor", request);
+            return await PostAsync<CarAdvisorAiRequestDto, AiSuggestionDto>("ArtificialIntelligence/car-advisor", request);
         }
         public async Task<BaseResult<AiSuggestionDto>> GetSmartCarRankingAsync(SmartCarRankingAiRequestDto request)
         {
-            return await PostAsync<SmartCarRankingAiRequestDto>("ArtificialIntelligence/smart-car-ranking", request);
+            return await PostAsync<SmartCarRankingAiRequestDto, AiSuggestionDto>("ArtificialIntelligence/smart-car-ranking", request);
+        }
+        public async Task<BaseResult<SmartPricingDto>> GetSmartPricingAsync(SmartPricingAiRequestDto request)
+        {
+            return await PostAsync<SmartPricingAiRequestDto, SmartPricingDto>("ArtificialIntelligence/smart-pricing", request);
         }
         public async Task<BaseResult<AiSuggestionDto>> GetReservationAssistantAsync(ReservationAssistantAiRequestDto request)
         {
-            return await PostAsync<ReservationAssistantAiRequestDto>("ArtificialIntelligence/reservation-assistant", request);
+            return await PostAsync<ReservationAssistantAiRequestDto, AiSuggestionDto>("ArtificialIntelligence/reservation-assistant", request);
         }
 
         public async Task<BaseResult<AiSuggestionDto>> GetAdminContentAsync(AdminContentAiRequestDto request)
         {
-            return await PostAsync<AdminContentAiRequestDto>("ArtificialIntelligence/admin-content", request);
+            return await PostAsync<AdminContentAiRequestDto, AiSuggestionDto>("ArtificialIntelligence/admin-content", request);
         }
 
-        private async Task<BaseResult<AiSuggestionDto>> PostAsync<TRequest>(string url, TRequest request)
+        private async Task<BaseResult<TResponse>> PostAsync<TRequest, TResponse>(string url, TRequest request)
         {
             var response = await _client.PostAsJsonAsync(url, request);
-            var result = await response.Content.ReadFromJsonAsync<BaseResult<AiSuggestionDto>>();
-            return result ?? new BaseResult<AiSuggestionDto>
+            var result = await response.Content.ReadFromJsonAsync<BaseResult<TResponse>>();
+            return result ?? new BaseResult<TResponse>
             {
                 Errors = new() { new Error { ErrorMessage = "AI servisi yanıtı okunamadı." } }
             };

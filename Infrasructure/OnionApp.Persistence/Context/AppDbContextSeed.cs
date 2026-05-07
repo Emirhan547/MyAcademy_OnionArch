@@ -51,14 +51,16 @@ namespace OnionApp.Persistence.Context
             }
 
             // ─── Pricings ──────────────────────────────────────────────────────────────
+            // ─── Pricings ──────────────────────────────────────────────────────────────
             if (!context.Pricings.Any())
             {
                 var pricings = new List<Pricing>
-                {
-                    new Pricing { Id = 2, Name = "Günlük" },
-                    new Pricing { Id = 3, Name = "Haftalık" },
-                    new Pricing { Id = 4, Name = "Aylık" },
-                };
+    {
+        new Pricing { Name = "Günlük" },
+        new Pricing { Name = "Haftalık" },
+        new Pricing { Name = "Aylık" },
+    };
+
                 await context.Pricings.AddRangeAsync(pricings);
                 await context.SaveChangesAsync();
             }

@@ -49,7 +49,17 @@ namespace OnionApp.Persistence.Context
                 .WithMany(y => y.DropOffReservation)
                 .HasForeignKey(z => z.DropOffLocationId)
                 .OnDelete(DeleteBehavior.ClientSetNull);
+            modelBuilder.Entity<CarPricing>()
+       .Property(x => x.Amount)
+       .HasPrecision(18, 2);
 
+            modelBuilder.Entity<RentACarProcess>()
+                .Property(x => x.TotalPrice)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Reservation>()
+                .Property(x => x.ExtraChargeAmount)
+                .HasPrecision(18, 2);
             modelBuilder.Entity<AppRole>().HasData(
                  new AppRole { Id = (int)RolesType.Admin, Name = RolesType.Admin.ToString(), NormalizedName = RolesType.Admin.ToString().ToUpperInvariant() },
                  new AppRole { Id = (int)RolesType.Member, Name = RolesType.Member.ToString(), NormalizedName = RolesType.Member.ToString().ToUpperInvariant() },
