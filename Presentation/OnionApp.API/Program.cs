@@ -12,13 +12,57 @@ using OnionApp.Domain.Entities;
 using OnionApp.Domain.Enums;
 using OnionApp.Persistence.Context;
 using OnionApp.Persistence.Extensions;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Scalar.AspNetCore;
 using Serilog;
 using System.Text;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+var serviceName = "OnionApp.API";
+var serviceVersion = typeof(Program).Assembly.GetName().Version?.ToString() ?? "1.0.0";
 
+var otelEndpoint = builder.Configuration["Elastic:OtlpEndpoint"] ?? "http://localhost:4317";
+var otelHeaders = builder.Configuration["Elastic:OtlpHeaders"];
+
+builder.Logging.ClearProviders();
+builder.Logging.AddOpenTelemetry(options =>
+{
+    options.IncludeScopes = true;
+    options.IncludeFormattedMessage = true;
+    options.ParseStateValues = true;
+
+    options.SetResourceBuilder(ResourceBuilder.CreateDefault()
+        .AddService(serviceName: serviceName, serviceVersion: serviceVersion));
+
+    options.AddOtlpExporter(exporterOptions =>
+    {
+        exporterOptions.Endpoint = new Uri(otelEndpoint);
+        if (!string.IsNullOrWhiteSpace(otelHeaders))
+        {
+            exporterOptions.Headers = otelHeaders;
+        }
+    });
+});
+
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService(serviceName, serviceVersion: serviceVersion))
+    .WithTracing(tracing =>
+    {
+        tracing
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddOtlpExporter(exporterOptions =>
+            {
+                exporterOptions.Endpoint = new Uri(otelEndpoint);
+                if (!string.IsNullOrWhiteSpace(otelHeaders))
+                {
+                    exporterOptions.Headers = otelHeaders;
+                }
+            });
+    });
 // Add services to the container.
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtIssuer = jwtSection["Issuer"] ?? throw new InvalidOperationException("Jwt:Issuer is required.");
