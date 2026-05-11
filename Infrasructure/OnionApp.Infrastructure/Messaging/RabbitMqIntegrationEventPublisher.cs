@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using OnionApp.Application.Contracts;
 using RabbitMQ.Client;
 
-namespace OnionApp.Persistence.Messaging;
+namespace OnionApp.Infrastructure.Messaging;
 
 public class RabbitMqIntegrationEventPublisher : IIntegrationEventPublisher
 {

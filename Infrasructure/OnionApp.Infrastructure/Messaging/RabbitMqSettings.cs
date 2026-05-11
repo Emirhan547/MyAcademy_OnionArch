@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OnionApp.Persistence.Messaging
+namespace OnionApp.Infrastructure.Messaging
 {
     public class RabbitMqSettings
     {

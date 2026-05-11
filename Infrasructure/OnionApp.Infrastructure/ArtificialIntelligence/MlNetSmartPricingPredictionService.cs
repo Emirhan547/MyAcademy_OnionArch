@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OnionApp.Persistence.ArtificialIntelligence
+namespace OnionApp.Infrastructure.ArtificialIntelligence
 {
     public sealed class MlNetSmartPricingPredictionService(ICarPricingRepository carPricingRepository) : ISmartPricingPredictionService
     {

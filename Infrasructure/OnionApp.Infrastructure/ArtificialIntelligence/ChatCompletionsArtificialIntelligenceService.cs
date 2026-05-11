@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Options;
+﻿
+using Microsoft.Extensions.Options;
 using OnionApp.Application.Contracts.AI;
 using OnionApp.Application.Features.Results;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -10,7 +10,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace OnionApp.Persistence.ArtificialIntelligence
+namespace OnionApp.Infrastructure.ArtificialIntelligence
 {
     public sealed class ChatCompletionsArtificialIntelligenceService(HttpClient httpClient, IOptions<AiSettings> options) : IArtificialIntelligenceService
     {
@@ -59,13 +59,25 @@ namespace OnionApp.Persistence.ArtificialIntelligence
             return new AiSuggestionResult
             {
                 Title = request.FallbackTitle,
-                Summary = content.Trim(),
+                Summary = NormalizeAiContent(content),
                 Suggestions = SplitSuggestions(content),
                 Source = _settings.Provider,
                 GeneratedAtUtc = DateTime.UtcNow
             };
         }
+        private static string NormalizeAiContent(string content)
+        {
+            var sanitized = content
+                .Replace("#*", string.Empty, StringComparison.Ordinal)
+                .Replace("*#", string.Empty, StringComparison.Ordinal);
 
+            var lines = sanitized
+                .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(line => line.TrimStart('#', ' '))
+                .Where(line => !string.IsNullOrWhiteSpace(line));
+
+            return string.Join(Environment.NewLine, lines).Trim();
+        }
         private static AiSuggestionResult CreateFallbackResult(AiPromptRequest request, string source)
         {
             return new AiSuggestionResult
@@ -80,7 +92,9 @@ namespace OnionApp.Persistence.ArtificialIntelligence
 
         private static List<string> SplitSuggestions(string content)
         {
-            return content.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            var normalizedContent = NormalizeAiContent(content);
+
+            return normalizedContent.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .Where(x => x.StartsWith("-") || x.StartsWith("•") || char.IsDigit(x[0]))
                 .Select(x => x.TrimStart('-', '•', ' ', '\t'))
                 .Take(8)
