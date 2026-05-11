@@ -15,22 +15,22 @@
         <br />
         <input type="hidden" asp-for="Reservation.CarId" class="form-control" placeholder="Almak İstediğiniz Araba">
         <div class="form-group">
-            <input type="text" asp-for="Reservation.Name" class="form-control" placeholder="Adınız">
+            <input type="text" asp-for="Reservation.Name" class="form-control" placeholder="Adınız" autocomplete="given-name" required>
         </div>
         <div class="form-group">
-            <input type="text" asp-for="Reservation.Surname" class="form-control" placeholder="Soyadınız">
+            <input type="text" asp-for="Reservation.Surname" class="form-control" placeholder="Soyadınız" autocomplete="family-name" required>
         </div>
         <div class="form-group">
-            <input type="text" asp-for="Reservation.Email" class="form-control" placeholder="Mail Adresiniz">
+            <input type="email" asp-for="Reservation.Email" class="form-control" placeholder="ornek@mail.com" autocomplete="email" required>
         </div>
         <div class="form-group">
-            <input type="text" asp-for="Reservation.Phone" class="form-control" placeholder="Telefon Numaranız">
+            <input type="tel" asp-for="Reservation.Phone" class="form-control" placeholder="05xx xxx xx xx" autocomplete="tel" required>
         </div>
         <div class="form-group">
-            @Html.DropDownListFor(x => x.Reservation.DropOffLocationId, Model.Locations, new { @class = "form-control" })
+            @Html.DropDownListFor(x => x.Reservation.DropOffLocationId, Model.Locations, "Teslim noktası seçin", new { @class = "form-control", required = "required" })
         </div>
         <div class="form-group">
-            @Html.DropDownListFor(x => x.Reservation.PickUpLocationId, Model.Locations, new { @class = "form-control" })
+            @Html.DropDownListFor(x => x.Reservation.PickUpLocationId, Model.Locations, "Alış noktası seçin", new { @class = "form-control", required = "required" })
         </div>
         <div class="form-group">
             <label>Alış Tarihi</label>
@@ -41,10 +41,10 @@
             <input type="date" asp-for="Reservation.ReturnDate" class="form-control">
         </div>
         <div class="form-group">
-            <input type="text" asp-for="Reservation.Age" class="form-control" placeholder="Yaşınız">
+            <input type="number" min="18" asp-for="Reservation.Age" class="form-control" placeholder="Yaşınız" required>
         </div>
         <div class="form-group">
-            <input type="text" asp-for="Reservation.DriverLicenseYear" class="form-control" placeholder="Ehliyet Yılınız">
+            <input type="number" min="1" asp-for="Reservation.DriverLicenseYear" class="form-control" placeholder="Ehliyet süreniz (yıl)" required>
         </div>
         <div class="form-group">
             <textarea asp-for="Reservation.Description" cols="30" rows="7" class="form-control" placeholder="Varsa Eklemek İstedikleriniz"></textarea>
