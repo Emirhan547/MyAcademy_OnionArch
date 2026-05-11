@@ -3,27 +3,75 @@ using OnionApp.Application.Base;
 using OnionApp.Application.Contracts.AI;
 using OnionApp.Application.Features.Queries.AiQueries;
 using OnionApp.Application.Features.Results;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OnionApp.Application.Features.Handlers.AiHandlers
 {
-    public sealed class GetReservationAssistantAiQueryHandler(IArtificialIntelligenceService aiService) : IRequestHandler<GetReservationAssistantAiQuery, BaseResult<AiSuggestionResult>>
+    public sealed class GetReservationAssistantAiQueryHandler(
+        IArtificialIntelligenceService aiService)
+        : IRequestHandler<GetReservationAssistantAiQuery, BaseResult<AiSuggestionResult>>
     {
-        public async Task<BaseResult<AiSuggestionResult>> Handle(GetReservationAssistantAiQuery request, CancellationToken cancellationToken)
+        public async Task<BaseResult<AiSuggestionResult>> Handle(
+            GetReservationAssistantAiQuery request,
+            CancellationToken cancellationToken)
         {
-            var prompt = $"Rezervasyon formunun iş akışı içinde risk, eksik bilgi ve operasyon kontrolü yap. Alış: {request.PickUpLocation} - {request.PickUpDate:dd.MM.yyyy}. İade: {request.DropOffLocation} - {request.ReturnDate:dd.MM.yyyy}. Yaş: {request.Age}. Ehliyet yılı: {request.DriverLicenseYear}. Notlar: {request.TravelNotes}. Yanıtında risk seviyesi, eksik/tamamlanması gereken bilgiler, müşteriyle teyit edilecek maddeler ve teslim günü hazırlık adımları olsun.";
-            var result = await aiService.GenerateSuggestionAsync(new AiPromptRequest
-            {
-                UseCase = "Kullanıcı Rezervasyon Asistanı",
-                SystemPrompt = "Sen CarBook rezervasyon formunun içinde çalışan Türkçe operasyon kontrol asistanısın. Kısa, net ve iş akışına uygun risk/eksik bilgi maddeleri üret; hukuki kesinlik iddiasında bulunma.",
-                UserPrompt = prompt,
-                FallbackTitle = "AI Rezervasyon Risk Kontrolü",
-                FallbackSuggestions = ["Alış ve iade saatlerinden önce lokasyon, kimlik ve ehliyet kontrollerini planlayın.", "Depozito, yakıt politikası, kilometre limiti ve sigorta seçeneklerini teslim öncesi doğrulayın.", "İade lokasyonu farklıysa trafik ve teslim prosedürü için ek süre bırakın."]
-            }, cancellationToken);
+            var prompt = $"""
+                Rezervasyon formunu analiz et ve operasyon kontrolü yap.
+
+                Alış Lokasyonu: {request.PickUpLocation}
+                Alış Tarihi: {request.PickUpDate:dd.MM.yyyy}
+
+                İade Lokasyonu: {request.DropOffLocation}
+                İade Tarihi: {request.ReturnDate:dd.MM.yyyy}
+
+                Yaş: {request.Age}
+                Ehliyet Yılı: {request.DriverLicenseYear}
+
+                Ek Notlar:
+                {request.TravelNotes}
+
+                Riskleri, eksik bilgileri ve teslim günü dikkat edilmesi gereken noktaları değerlendir.
+                """;
+
+            var result = await aiService.GenerateSuggestionAsync(
+                new AiPromptRequest
+                {
+                    UseCase = "Kullanıcı Rezervasyon Asistanı",
+
+                    SystemPrompt = """
+                    Sen CarBook rezervasyon sisteminde çalışan operasyon kontrol asistanısın.
+
+                    Yanıtları SADECE düz metin olarak üret.
+
+                    Kurallar:
+                    - Markdown kullanma
+                    - Tablo oluşturma
+                    - #, ##, **, |, ---, •, ✅ gibi özel karakterler kullanma
+                    - Hukuki kesinlik belirtme
+                    - Kısa ve net yaz
+                    - Maksimum 5 kısa madde oluştur
+                    - Her maddeyi numaralandır
+
+                    Cevap formatı şu şekilde olsun:
+
+                    1. Risk veya kontrol bilgisi
+                    Açıklama
+
+                    2. Risk veya kontrol bilgisi
+                    Açıklama
+                    """,
+
+                    UserPrompt = prompt,
+
+                    FallbackTitle = "AI Rezervasyon Risk Kontrolü",
+
+                    FallbackSuggestions =
+                    [
+                        "Teslim öncesinde kimlik ve ehliyet bilgilerini doğrulayın.",
+                        "Depozito ve sigorta detaylarını müşteriye tekrar hatırlatın.",
+                        "Farklı iade lokasyonlarında trafik ve teslim süresini önceden planlayın."
+                    ]
+                },
+                cancellationToken);
 
             return BaseResult<AiSuggestionResult>.Success(result);
         }

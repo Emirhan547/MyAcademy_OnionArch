@@ -303,27 +303,32 @@ namespace OnionApp.Persistence.Context
             {
                 var cars = context.Cars.ToList();
                 var features = context.Features.ToList();
-                var rand = new Random(42);
+               
                 var carFeatures = new List<CarFeature>();
 
                 foreach (var car in cars)
                 {
-                    // Klima, Bluetooth — her araca var
+                    var isPremium = car.BrandId == cars.First(c => c.Model == "3 Series").BrandId
+                                     || car.BrandId == cars.First(c => c.Model == "C 200").BrandId
+                                     || car.BrandId == cars.First(c => c.Model == "A4 2.0 TDI").BrandId;
+                    var isSuv = car.Seat >= 7 || car.Model.Contains("X5") || car.Model.Contains("GLE") || car.Model.Contains("Q5") || car.Model.Contains("RAV4");
+                    var isElectricOrHybrid = car.Fuel is "Elektrik" or "Hibrit";
+                    var isManual = car.Transmission == "Manuel";
                     foreach (var feat in features)
                     {
                         bool available = feat.Name switch
                         {
                             "Klima" => true,
                             "Bluetooth" => true,
-                            "Geri Görüş Kamerası" => car.Fuel != "Benzin" || car.Model.Contains("X5") || car.Model.Contains("Q5") || car.Model.Contains("GLE"),
-                            "Navigasyon" => rand.NextDouble() > 0.3,
-                            "Şerit Takip Sistemi" => rand.NextDouble() > 0.4,
-                            "Adaptif Hız Sabitleme" => rand.NextDouble() > 0.5,
-                            "Isıtmalı Koltuk" => car.Fuel is "Elektrik" or "Hibrit" || rand.NextDouble() > 0.5,
-                            "Panoramik Tavan" => car.Model.Contains("X5") || car.Model.Contains("GLE") || car.Model.Contains("Q5") || car.Model.Contains("RAV4") || rand.NextDouble() > 0.7,
-                            "Deri Döşeme" => car.Model.Contains("5 Series") || car.Model.Contains("E 220") || car.Model.Contains("GLE") || car.Model.Contains("iX3") || car.Model.Contains("e-tron") || rand.NextDouble() > 0.6,
-                            "Otomatik Park" => car.Fuel is "Elektrik" || rand.NextDouble() > 0.75,
-                            _ => rand.NextDouble() > 0.5
+                            "Geri Görüş Kamerası" => !isManual || isSuv || isElectricOrHybrid,
+                            "Navigasyon" => isPremium || isSuv || isElectricOrHybrid,
+                            "Şerit Takip Sistemi" => isPremium || isElectricOrHybrid || car.Model.Contains("Passat"),
+                            "Adaptif Hız Sabitleme" => isPremium || isElectricOrHybrid || isSuv,
+                            "Isıtmalı Koltuk" => isPremium || isElectricOrHybrid,
+                            "Panoramik Tavan" => isSuv || car.Model.Contains("5 Series") || car.Model.Contains("E 220"),
+                            "Deri Döşeme" => isPremium || isElectricOrHybrid || car.Model.Contains("5 Series") || car.Model.Contains("E 220"),
+                            "Otomatik Park" => isPremium || isElectricOrHybrid || car.Model.Contains("Passat"),
+                            _ => false
                         };
                         carFeatures.Add(new CarFeature
                         {
@@ -347,7 +352,11 @@ namespace OnionApp.Persistence.Context
                 // Her araç en az 2 konumda mevcut
                 foreach (var car in cars)
                 {
-                    var pickedLocations = locations.OrderBy(_ => Guid.NewGuid()).Take(2).ToList();
+                    var pickedLocations = car.Fuel == "Elektrik"
+                          ? locations.Where(l => l.Name.Contains("Havalimanı") || l.Name.Contains("Ataşehir")).Take(2).ToList()
+                          : car.Seat >= 7
+                              ? locations.Where(l => l.Name.Contains("Havalimanı")).Take(2).ToList()
+                              : locations.Where(l => l.Name.Contains("Kadıköy") || l.Name.Contains("Beşiktaş")).Take(1).ToList();
                     foreach (var loc in pickedLocations)
                     {
                         rentACars.Add(new RentACar
@@ -366,41 +375,33 @@ namespace OnionApp.Persistence.Context
             if (!context.Reviews.Any())
             {
                 var cars = context.Cars.ToList();
-                var reviews = new List<Review>();
-
-                var reviewData = new[]
+                var reviewByModel = new Dictionary<string, (string name, string image, string comment, string rating)>
                 {
-                    ("Ahmet Yılmaz",   "https://i.pravatar.cc/150?img=1",  "Harika bir araç! Hem konforlu hem de yakıt tasarruflu. Kesinlikle tavsiye ederim.", "5"),
-                    ("Fatma Kaya",     "https://i.pravatar.cc/150?img=2",  "Motor performansı beklentilerimin üzerindeydi, iç mekan kalitesi de çok iyiydi.", "5"),
-                    ("Mehmet Demir",   "https://i.pravatar.cc/150?img=3",  "Navigasyon sistemi biraz karmaşık ama genel olarak tatmin edici bir deneyim.", "4"),
-                    ("Ayşe Çelik",     "https://i.pravatar.cc/150?img=4",  "Ailecek hafta sonu gezimizde kullandık, yeterince geniş ve konforlu buldum.", "4"),
-                    ("Can Öztürk",     "https://i.pravatar.cc/150?img=5",  "Direksiyon yönetimi çok hassas, uzun yolda yorgunluk hissetmedim.", "5"),
-                    ("Selin Arslan",   "https://i.pravatar.cc/150?img=6",  "Araç temiz ve bakımlıydı fakat park sensörü biraz geç tepki verdi.", "3"),
-                    ("Emre Koç",       "https://i.pravatar.cc/150?img=7",  "Elektrikli araç deneyimim oldu ilk kez, çok memnun kaldım, sessiz ve güçlü.", "5"),
-                    ("Zeynep Yıldız",  "https://i.pravatar.cc/150?img=8",  "Yakıt tüketimi konusunda gerçekten tasarruflu, uzun yolda 5,2 lt/100km yaptık.", "5"),
-                    ("Burak Şahin",    "https://i.pravatar.cc/150?img=9",  "Koltuklar biraz sert ama diğer özelliklerde hiç sorun yaşamadım.", "4"),
-                    ("Merve Aydın",    "https://i.pravatar.cc/150?img=10", "Sesiz sürüş ve üst düzey iç mekan, patronumu havalimanında karşılamak için mükemmeldi.", "5"),
+                    ["3 Series"] = ("Mert Aydın", "https://i.pravatar.cc/150?img=1", "İstanbul-Ankara yolunda kullandım, direksiyon tepkisi ve yol tutuşu gerçekten çok iyiydi.", "5"),
+                    ["X5"] = ("Duygu Yalçın", "https://i.pravatar.cc/150?img=2", "Ailece seyahatte geniş bagaj ve 7 koltuk büyük kolaylık sağladı.", "5"),
+                    ["E 220d"] = ("Burak Demir", "https://i.pravatar.cc/150?img=3", "Uzun yolda sessiz kabin ve düşük tüketim beklentimi karşıladı.", "5"),
+                    ["Passat 2.0 TDI"] = ("Tolga Er", "https://i.pravatar.cc/150?img=4", "İş gezisi için kiraladım; konforlu ve stabil bir sürüş sundu.", "4"),
+                    ["Corolla Hybrid"] = ("Büşra Akın", "https://i.pravatar.cc/150?img=5", "Şehir içinde hibrit sistem sayesinde yakıt masrafı belirgin şekilde düştü.", "5"),
+                    ["iX3"] = ("Onur Çetin", "https://i.pravatar.cc/150?img=6", "İlk elektrikli araç deneyimimdi, şarj planlaması kolay ve sürüş çok akıcıydı.", "5")
                 };
 
                 var startDate = new DateTime(2025, 1, 1);
-                int reviewIdx = 0;
-                foreach (var car in cars)
+                var reviews = new List<Review>();
+                int dayOffset = 0;
+                foreach (var pair in reviewByModel)
                 {
-                    int count = new Random(car.Id).Next(2, 5);
-                    for (int i = 0; i < count; i++)
+                    var car = cars.FirstOrDefault(c => c.Model == pair.Key);
+                    if (car is null) continue;
+                    reviews.Add(new Review
                     {
-                        var rd = reviewData[reviewIdx % reviewData.Length];
-                        reviews.Add(new Review
-                        {
-                            CarId = car.Id,
-                            CustomerName = rd.Item1,
-                            CustomerImage = rd.Item2,
-                            Comment = rd.Item3,
-                            RaytingValue = rd.Item4,
-                            ReviewDate = startDate.AddDays(reviewIdx * 9)
-                        });
-                        reviewIdx++;
-                    }
+                        CarId = car.Id,
+                        CustomerName = pair.Value.name,
+                        CustomerImage = pair.Value.image,
+                        Comment = pair.Value.comment,
+                        RaytingValue = pair.Value.rating,
+                        ReviewDate = startDate.AddDays(dayOffset)
+                    });
+                    dayOffset += 12;
                 }
                 await context.Reviews.AddRangeAsync(reviews);
                 await context.SaveChangesAsync();
@@ -637,14 +638,35 @@ namespace OnionApp.Persistence.Context
             if (!context.Services.Any())
             {
                 var services = new List<Service>
-                {
-                    new Service { Title = "7/24 Müşteri Desteği",     Description = "Günün her saati müşteri hizmetlerimize ulaşabilir, her türlü sorunuza anında yanıt alabilirsiniz.",            IconUrl = "flaticon-support" },
-                    new Service { Title = "Ücretsiz Araç Teslimatı",  Description = "Belirlediğiniz adrese ücretsiz araç teslim ediyoruz. Havalimanı, otel veya ev fark etmez.",                     IconUrl = "flaticon-delivery" },
-                    new Service { Title = "Esnek İptal Seçenekleri",  Description = "Rezervasyon tarihinden 24 saat öncesine kadar ücretsiz iptal hakkından yararlanabilirsiniz.",                    IconUrl = "flaticon-calendar" },
-                    new Service { Title = "Kapsamlı Kasko Güvencesi", Description = "Tüm araçlarımız tam kasko sigortalıdır. Ekstra güvence için kendi seçeneklerimizi de inceleyebilirsiniz.",       IconUrl = "flaticon-shield" },
-                    new Service { Title = "Geniş Araç Filosu",        Description = "Ekonomik kompaktlardan lüks SUV'lara, hibrit ve elektrikli araçlara kadar 100'den fazla model seçeneği sunuyoruz.", IconUrl = "flaticon-car" },
-                    new Service { Title = "Hızlı Çevrimiçi Kiralama", Description = "Mobil uygulama veya web sitemiz üzerinden dakikalar içinde rezervasyon yapın, onayınız anında gelsin.",           IconUrl = "flaticon-click" },
-                };
+{
+    new Service
+    {
+        Title = "7/24 Müşteri Desteği",
+        Description = "Günün her saati müşteri hizmetlerimize ulaşabilir, her türlü sorunuza anında yanıt alabilirsiniz.",
+        IconUrl = "flaticon-call-center"
+    },
+
+    new Service
+    {
+        Title = "Ücretsiz Araç Teslimatı",
+        Description = "Belirlediğiniz adrese ücretsiz araç teslim ediyoruz. Havalimanı, otel veya ev fark etmez.",
+        IconUrl = "flaticon-car"
+    },
+
+    new Service
+    {
+        Title = "Esnek İptal Seçenekleri",
+        Description = "Rezervasyon tarihinden 24 saat öncesine kadar ücretsiz iptal hakkından yararlanabilirsiniz.",
+        IconUrl = "flaticon-route"
+    },
+
+    new Service
+    {
+        Title = "Kapsamlı Kasko Güvencesi",
+        Description = "Tüm araçlarımız tam kasko sigortalıdır. Ekstra güvence için kendi seçeneklerimizi de inceleyebilirsiniz.",
+        IconUrl = "flaticon-rent"
+    }
+};
                 await context.Services.AddRangeAsync(services);
                 await context.SaveChangesAsync();
             }
@@ -654,22 +676,11 @@ namespace OnionApp.Persistence.Context
             {
                 var abouts = new List<About>
                 {
+                   
                     new About
                     {
-                        Title       = "Türkiye'nin Güvenilir Araç Kiralama Platformu",
-                        Description = "2015 yılında kurulan şirketimiz, bugün 8 şehirde 100'den fazla araçlık filosuyla hizmet vermektedir. Müşteri memnuniyetini her zaman ön planda tutan yaklaşımımız, bizi sektörde güvenilir bir marka haline getirmiştir.",
-                        ImageUrl    = "https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=800"
-                    },
-                    new About
-                    {
-                        Title       = "Misyonumuz",
-                        Description = "Her müşterimizin ihtiyacına özel, konforlu ve güvenli bir araç deneyimi sunmak. Şeffaf fiyatlandırma, temiz araçlar ve hızlı hizmet anlayışıyla araç kiralamayı zahmetsiz bir deneyime dönüştürmek.",
-                        ImageUrl    = "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=800"
-                    },
-                    new About
-                    {
-                        Title       = "Sürdürülebilir Mobilite",
-                        Description = "Elektrikli ve hibrit araç seçeneklerimizi genişleterek karbon ayak izimizi azaltmayı hedefliyoruz. 2030'a kadar filomuzun %40'ını sıfır emisyonlu araçlarla doldurmayı planlıyoruz.",
+                        Title       = "Güvenilir ve Şeffaf Araç Kiralama",
+                        Description = "2015'ten bu yana bireysel ve kurumsal müşterilere şeffaf fiyatlandırma, bakımlı araçlar ve hızlı teslimat süreçleri sunuyoruz. Filomuzda ekonomik, SUV, hibrit ve elektrikli seçenekler dengeli şekilde yer alır.",
                         ImageUrl    = "https://images.unsplash.com/photo-1593941707874-ef25b8b4a92b?w=800"
                     },
                 };
@@ -682,26 +693,13 @@ namespace OnionApp.Persistence.Context
             {
                 var banners = new List<Banner>
                 {
+                   
                     new Banner
                     {
-                        Title            = "Özgürce Keşfet, Konforla Ulaş",
-                        Description      = "Türkiye'nin dört bir yanında premium araçlarla seyahat edin. Yüzlerce model, rekabetçi fiyatlar ve 7/24 destek.",
-                        VideoDescription = "Araç kiralama artık çok daha kolay",
-                        VideoUrl         = "https://www.youtube.com/embed/dQw4w9WgXcQ"
-                    },
-                    new Banner
-                    {
-                        Title            = "Yaz Kampanyası: %20 İndirim",
-                        Description      = "Temmuz ve Ağustos rezervasyonlarınızda tüm araç sınıflarında %20 indirim fırsatını kaçırmayın.",
-                        VideoDescription = "Yaz tatilini unutulmaz kıl",
-                        VideoUrl         = "https://www.youtube.com/embed/dQw4w9WgXcQ"
-                    },
-                    new Banner
-                    {
-                        Title            = "Elektrikli Araç Deneyimi",
-                        Description      = "BMW iX3 ve Audi e-tron ile geleceğin sürüş deneyimini bugün yaşayın. Sessiz, güçlü ve çevre dostu.",
-                        VideoDescription = "Elektrikli araçlar hakkında her şey",
-                        VideoUrl         = "https://www.youtube.com/embed/dQw4w9WgXcQ"
+                        Title            = "Şehir İçi ve Şehirler Arası Kiralamada Doğru Tercih",
+                        Description      = "Havalimanı teslim noktaları, yeni model araçlar ve 7/24 destek ile planınıza uygun kiralamayı dakikalar içinde tamamlayın.",
+                        VideoDescription = "Hızlı rezervasyon ve güvenli sürüş deneyimi",
+                        VideoUrl         = "https://www.youtube.com/embed/6P3SgY7M8GQ"
                     },
                 };
                 await context.Banners.AddRangeAsync(banners);
@@ -751,20 +749,7 @@ namespace OnionApp.Persistence.Context
                         Phone       = "+90 212 555 0100",
                         Email       = "istanbul@rentacar.com.tr"
                     },
-                    new FooterAddress
-                    {
-                        Description = "Ankara Şube",
-                        Address     = "Tunalı Hilmi Cad. No:78 Kavaklıdere, Ankara",
-                        Phone       = "+90 312 555 0200",
-                        Email       = "ankara@rentacar.com.tr"
-                    },
-                    new FooterAddress
-                    {
-                        Description = "İzmir Şube",
-                        Address     = "Atatürk Cad. No:42 Alsancak, İzmir",
-                        Phone       = "+90 232 555 0300",
-                        Email       = "izmir@rentacar.com.tr"
-                    },
+                   
                 };
                 await context.FooterAddresses.AddRangeAsync(footerAddresses);
                 await context.SaveChangesAsync();
@@ -775,12 +760,8 @@ namespace OnionApp.Persistence.Context
             {
                 var contacts = new List<Contact>
                 {
-                    new Contact { Name = "Kemal Aydın",    Email = "kemal.aydin@gmail.com",     Subject = "Uzun dönem kiralama",         Message = "30 günlük kiralama için fiyat teklifi alabilir miyim?",                    SendDate = new DateTime(2025, 3, 10) },
-                    new Contact { Name = "Sema Demir",     Email = "sema.demir@hotmail.com",    Subject = "Havalimanı teslim",           Message = "Sabah 06:00'da araç teslimi mümkün mü?",                                   SendDate = new DateTime(2025, 3, 15) },
-                    new Contact { Name = "Volkan Çetin",   Email = "volkan.cetin@outlook.com",  Subject = "Çocuk koltuğu",              Message = "Rezervasyona çocuk koltuğu ekleyebilir miyim?",                            SendDate = new DateTime(2025, 3, 22) },
-                    new Contact { Name = "Özlem Güler",    Email = "ozlem.guler@yandex.com",    Subject = "İptal ve iade",              Message = "Rezervasyonumu iptal etmek istiyorum, iade süreci nasıl işliyor?",          SendDate = new DateTime(2025, 4, 5) },
-                    new Contact { Name = "Berk Kaçmaz",    Email = "berk.kacmaz@gmail.com",     Subject = "Yurt dışı seyahat izni",     Message = "Yunanistan'a geçiş için ek belge gerekmekte midir?",                       SendDate = new DateTime(2025, 4, 18) },
-                    new Contact { Name = "İrem Özdemir",   Email = "irem.ozdemir@icloud.com",   Subject = "Kurumsal fatura",            Message = "Firmamız adına fatura kesilebiliyor mu?",                                   SendDate = new DateTime(2025, 5, 2) },
+                     new Contact { Name = "Kemal Aydın", Email = "kemal.aydin@gmail.com", Subject = "Uzun dönem kurumsal kiralama", Message = "3 araç için 30 günlük kurumsal kiralama teklifi ve faturalandırma detaylarını paylaşabilir misiniz?", SendDate = new DateTime(2025, 3, 10) },
+                    new Contact { Name = "Sema Demir", Email = "sema.demir@hotmail.com", Subject = "Havalimanı teslim & iade", Message = "İstanbul Havalimanı'ndan sabah 06:00 teslim alıp iki gün sonra Sabiha Gökçen'e iade etmek istiyorum, süreç uygun mudur?", SendDate = new DateTime(2025, 3, 15) },
                 };
                 await context.Contacts.AddRangeAsync(contacts);
                 await context.SaveChangesAsync();
