@@ -17,8 +17,10 @@ namespace OnionApp.Application.Features.Handlers.CarPricingHandlers
         public async Task<BaseResult<List<GetCarPricingWithCarQueryResult>>> Handle(GetCarPricingWithCarQuery request, CancellationToken cancellationToken)
         {
             var result = await _repository.GetCarPricingWithCars();
-            var mapped = result.Select(x => new GetCarPricingWithCarQueryResult
-            {
+            var mapped = result
+                  .Where(x => x.Pricing != null && x.Pricing.Name == "Günlük")
+                  .Select(x => new GetCarPricingWithCarQueryResult
+                  {
                 CarId = x.CarId,
                 CarPricingId = x.Id,
                 Brand = x.Car?.Brand?.Name ?? string.Empty,

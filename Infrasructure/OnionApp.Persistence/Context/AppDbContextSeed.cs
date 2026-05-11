@@ -7,11 +7,59 @@ namespace OnionApp.Persistence.Context
 {
     public static class AppDbContextSeed
     {
+        private static async Task NormalizeCarsAndPricingsAsync(AppDbContext context)
+        {
+            var duplicateCars = await context.Cars
+                .GroupBy(c => new { c.BrandId, c.Model })
+                .Where(g => g.Count() > 1)
+                .Select(g => g.OrderBy(c => c.Id).ToList())
+                .ToListAsync();
+
+            foreach (var group in duplicateCars)
+            {
+                var keeper = group.First();
+                var duplicates = group.Skip(1).ToList();
+
+                foreach (var duplicate in duplicates)
+                {
+                    await context.CarPricings.Where(x => x.CarId == duplicate.Id)
+                        .ExecuteDeleteAsync();
+                    await context.CarFeatures.Where(x => x.CarId == duplicate.Id)
+                        .ExecuteDeleteAsync();
+                    await context.RentACars.Where(x => x.CarId == duplicate.Id)
+                        .ExecuteDeleteAsync();
+                    await context.Reviews.Where(x => x.CarId == duplicate.Id)
+                        .ExecuteDeleteAsync();
+                    await context.CarDescriptions.Where(x => x.CarId == duplicate.Id)
+                        .ExecuteDeleteAsync();
+
+                    context.Cars.Remove(duplicate);
+                }
+            }
+
+            var pricingMap = await context.Pricings.ToDictionaryAsync(x => x.Name.ToLower());
+            if (!pricingMap.ContainsKey("günlük")) context.Pricings.Add(new Pricing { Name = "Günlük" });
+            if (!pricingMap.ContainsKey("haftalık")) context.Pricings.Add(new Pricing { Name = "Haftalık" });
+            if (!pricingMap.ContainsKey("aylık")) context.Pricings.Add(new Pricing { Name = "Aylık" });
+
+            await context.SaveChangesAsync();
+
+            var requiredNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Günlük", "Haftalık", "Aylık" };
+            var extraPricings = await context.Pricings.Where(p => !requiredNames.Contains(p.Name)).ToListAsync();
+            foreach (var pricing in extraPricings)
+            {
+                await context.CarPricings.Where(cp => cp.PricingId == pricing.Id).ExecuteDeleteAsync();
+                context.Pricings.Remove(pricing);
+            }
+
+            await context.SaveChangesAsync();
+        }
         public static async Task MigrateAsync(AppDbContext context, UserManager<AppUser> userManager)
         {
+
             // ─── Migrations ────────────────────────────────────────────────────────────
             await context.Database.MigrateAsync();
-
+            await NormalizeCarsAndPricingsAsync(context);
             // ─── Brands ────────────────────────────────────────────────────────────────
             if (!context.Brands.Any())
             {
@@ -262,6 +310,7 @@ namespace OnionApp.Persistence.Context
                 int dailyId = pricings.First(p => p.Name == "Günlük").Id;
                 int weeklyId = pricings.First(p => p.Name == "Haftalık").Id;
                 int monthId = pricings.First(p => p.Name == "Aylık").Id;
+                await context.CarPricings.ExecuteDeleteAsync();
 
                 // daily : weekly : monthly ≈ 1 : 5.5 : 18
                 var priceMap = new Dictionary<string, (decimal daily, decimal weekly, decimal monthly)>
@@ -303,7 +352,7 @@ namespace OnionApp.Persistence.Context
             {
                 var cars = context.Cars.ToList();
                 var features = context.Features.ToList();
-               
+
                 var carFeatures = new List<CarFeature>();
 
                 foreach (var car in cars)
@@ -676,7 +725,7 @@ namespace OnionApp.Persistence.Context
             {
                 var abouts = new List<About>
                 {
-                   
+
                     new About
                     {
                         Title       = "Güvenilir ve Şeffaf Araç Kiralama",
@@ -693,7 +742,7 @@ namespace OnionApp.Persistence.Context
             {
                 var banners = new List<Banner>
                 {
-                   
+
                     new Banner
                     {
                         Title            = "Şehir İçi ve Şehirler Arası Kiralamada Doğru Tercih",
@@ -749,7 +798,7 @@ namespace OnionApp.Persistence.Context
                         Phone       = "+90 212 555 0100",
                         Email       = "istanbul@rentacar.com.tr"
                     },
-                   
+
                 };
                 await context.FooterAddresses.AddRangeAsync(footerAddresses);
                 await context.SaveChangesAsync();

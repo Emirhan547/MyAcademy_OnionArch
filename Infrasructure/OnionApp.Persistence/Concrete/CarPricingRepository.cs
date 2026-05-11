@@ -45,23 +45,18 @@ namespace OnionApp.Persistence.Concrete
             using var command = _context.Database.GetDbConnection().CreateCommand();
 
             command.CommandText = @"
-                SELECT Model, Name, CoverImageUrl, [2], [3], [4]
-                FROM
-                (
-                    SELECT 
-                        Cars.Model, 
-                        Brands.Name, 
-                        Cars.CoverImageUrl, 
-                        CarPricings.PricingId, 
-                        CarPricings.Amount 
-                    FROM CarPricings 
-                    INNER JOIN Cars ON Cars.Id = CarPricings.CarId 
-                    INNER JOIN Brands ON Brands.Id = Cars.BrandId
-                ) AS SourceTable 
-                PIVOT 
-                (
-                    SUM(Amount) FOR PricingId IN ([2],[3],[4])
-                ) AS PivotTable;
+               SELECT 
+                    c.Model,
+                    b.Name,
+                    c.CoverImageUrl,
+                    SUM(CASE WHEN p.Name = N'Günlük' THEN cp.Amount ELSE 0 END) AS DailyAmount,
+                    SUM(CASE WHEN p.Name = N'Haftalık' THEN cp.Amount ELSE 0 END) AS WeeklyAmount,
+                    SUM(CASE WHEN p.Name = N'Aylık' THEN cp.Amount ELSE 0 END) AS MonthlyAmount
+                FROM CarPricings cp
+                INNER JOIN Cars c ON c.Id = cp.CarId
+                INNER JOIN Brands b ON b.Id = c.BrandId
+                INNER JOIN Pricings p ON p.Id = cp.PricingId
+                GROUP BY c.Id, c.Model, b.Name, c.CoverImageUrl;
             ";
 
             command.CommandType = System.Data.CommandType.Text;
@@ -78,9 +73,9 @@ namespace OnionApp.Persistence.Concrete
                     Model = reader["Model"]?.ToString(),
                     CoverImageUrl = reader["CoverImageUrl"]?.ToString(),
 
-                    DailyAmount = GetSafeDecimal(reader["2"]),
-                    WeeklyAmount = GetSafeDecimal(reader["3"]),
-                    MonthlyAmount = GetSafeDecimal(reader["4"])
+                    DailyAmount = GetSafeDecimal(reader["DailyAmount"]),
+                    WeeklyAmount = GetSafeDecimal(reader["WeeklyAmount"]),
+                    MonthlyAmount = GetSafeDecimal(reader["MonthlyAmount"])
                 };
 
                 values.Add(item);
