@@ -526,7 +526,7 @@ namespace OnionApp.Persistence.Context
                     new Blog
                     {
                         Title = "BMW 3 Serisi Test: Spor Sürüşün Referansı",
-                        Description = "BMW'nin ikonik 3 Serisi, spor sedan segmentinde neden hâlâ rakipsiz? Motor performansı, direksiyon hassasiyeti ve iç mekan kalitesiyle detaylı test sonuçlarımızı paylaşıyoruz.",
+                        Description = "BMW’nin efsaneleşmiş 3 Serisi modeli, yıllardır spor sedan segmentinin en güçlü temsilcilerinden biri olarak gösteriliyor. Dinamik sürüş karakteri, premium iç mekan kalitesi ve güçlü motor seçenekleri sayesinde hem otomobil tutkunlarının hem de günlük kullanıcıların favorileri arasında yer almayı başarıyor. Özellikle sürüş keyfini ön planda tutan kullanıcılar için geliştirilen 3 Serisi, yıllar içerisinde teknolojik olarak büyük gelişim gösterse de sportif ruhundan hiçbir zaman ödün vermedi.\r\n\r\nBu detaylı incelememizde BMW 3 Serisi’nin tasarım detaylarından motor performansına, yakıt tüketiminden sürüş konforuna kadar merak edilen tüm noktaları ele alıyoruz. Ayrıca şehir içi kullanım deneyimi, uzun yol performansı, sürüş destek sistemleri ve rakipleri karşısındaki avantajlarını da gerçek kullanıcı deneyimleriyle birlikte değerlendiriyoruz.\r\n\r\nDış tasarıma baktığımızda BMW 3 Serisi’nin modern ve agresif çizgileri ilk bakışta dikkat çekiyor. Geniş böbrek ızgaraları, keskin LED far tasarımı ve aerodinamik gövde yapısı araca sportif bir karakter kazandırıyor. Özellikle M Sport paketlerde kullanılan detaylar aracın premium hissiyatını ciddi şekilde artırıyor. Yandan bakıldığında uzun kaput yapısı ve dengeli gövde oranları klasik BMW tasarım anlayışını başarılı şekilde yansıtıyor.\r\n\r\nİç mekanda ise sürücü odaklı kokpit tasarımı öne çıkıyor. Dijital gösterge paneli, yüksek çözünürlüklü multimedya ekranı ve kaliteli malzeme kullanımı sayesinde araç içerisinde premium bir atmosfer hissediliyor. Ön koltukların sunduğu destek seviyesi özellikle uzun yolculuklarda ciddi konfor sağlıyor. Arka yaşam alanı önceki nesillere göre daha ferah hissettirirken bagaj hacmi de günlük kullanım ihtiyaçlarını rahatlıkla karşılayabiliyor.\r\n\r\nSürüş tarafında BMW 3 Serisi’nin en güçlü olduğu alan direksiyon tepkileri ve yol tutuş performansı diyebiliriz. Özellikle virajlı yollarda sunduğu denge hissi sürücüye ciddi bir güven veriyor. Direksiyon sistemi oldukça hassas çalışıyor ve araçla sürücü arasında güçlü bir bağlantı hissediliyor. Süspansiyon sistemi sportif karakteri korurken konfor seviyesinden de tamamen ödün vermiyor. Bu denge, 3 Serisi’ni hem günlük kullanıma hem de performans odaklı sürüşlere uygun hale getiriyor.\r\n\r\nMotor seçenekleri tarafında ise BMW farklı kullanıcı ihtiyaçlarına hitap eden geniş bir seçenek sunuyor. Benzinli motorlar yüksek devirlerde sunduğu akıcılıkla dikkat çekerken dizel motorlar düşük yakıt tüketimi ve uzun yol performansıyla öne çıkıyor. Hibrit destekli versiyonlarda ise hem performans hem de verimlilik başarılı şekilde dengelenmiş durumda. Özellikle şehir içi kullanımlarda start-stop sistemi ve optimize edilmiş motor yönetimi sayesinde yakıt tüketimi segment ortalamasının altında kalabiliyor.\r\n\r\nTeknoloji tarafında araç oldukça güçlü donanımlarla geliyor. Adaptif hız sabitleyici, şerit takip sistemi, kör nokta uyarısı, çarpışma önleme asistanı ve park destek sistemleri sürüş güvenliğini ciddi şekilde artırıyor. BMW’nin iDrive multimedya sistemi ise kullanım kolaylığı açısından segmentin en başarılı sistemlerinden biri olarak gösteriliyor. Hem dokunmatik kullanım hem de fiziksel kontrol düğmeleri sayesinde sürüş sırasında dikkat dağıtmadan sistemi kontrol etmek mümkün oluyor.\r\n\r\nUzun yol performansında BMW 3 Serisi’nin sunduğu izolasyon seviyesi de dikkat çekici. Rüzgar ve yol sesi büyük ölçüde kabin dışında tutulurken yüksek hızlarda bile araç içerisindeki konfor hissi korunuyor. Özellikle otoyol sürüşlerinde motorun sessiz çalışma karakteri premium hissiyatı destekleyen önemli detaylardan biri oluyor.\r\n\r\nRakipleriyle karşılaştırıldığında Mercedes C-Serisi daha konfor odaklı bir yapı sunarken Audi A4 teknolojik detaylarıyla öne çıkıyor. BMW 3 Serisi ise bu iki model arasında sportif sürüş karakteriyle farklılaşıyor. Direksiyon hissi, şasi dengesi ve sürüş keyfi açısından hâlâ segmentin referans modellerinden biri olarak kabul ediliyor.\r\n\r\nSonuç olarak BMW 3 Serisi, yalnızca bir premium sedan değil aynı zamanda sürüş deneyimini önemseyen kullanıcılar için özel bir otomobil karakteri sunuyor. Günlük kullanım konforu, performans odaklı sürüş yapısı, kaliteli iç mekanı ve gelişmiş teknolojileri sayesinde yıllardır segmentindeki güçlü konumunu korumayı başarıyor. Eğer hem prestijli hem de sürüş keyfi yüksek bir sedan arıyorsanız BMW 3 Serisi hâlâ değerlendirilebilecek en güçlü seçeneklerden biri olmaya devam ediyor.",
                         AuthorId = a1, CategoryId = catInceleme,
                         CoverImageUrl = "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800",
                         CreatedDate = new DateTime(2025, 2, 10)
@@ -641,21 +641,112 @@ namespace OnionApp.Persistence.Context
             {
                 var blogs = context.Blogs.ToList();
                 var comments = new List<Comment>();
-
-                var commentPool = new (string name, string email, string text)[]
+                var commentPool = new (string name, string email, string image, string text)[]
                 {
-                    ("Ali Vural",       "ali.vural@mail.com",      "Çok faydalı bir yazı, teşekkürler!"),
-                    ("Elif Kaplan",     "elif.kaplan@mail.com",    "Tam aradığım bilgiler vardı, ellerinize sağlık."),
-                    ("Hasan Demir",     "hasan.demir@mail.com",    "Bu konuda daha detaylı yazı yazmanızı bekliyoruz."),
-                    ("Nuray Acar",      "nuray.acar@mail.com",     "Deneyimlerim de yazıdaki ile örtüşüyor, kesinlikle katılıyorum."),
-                    ("Tarık Özkan",     "tarik.ozkan@mail.com",    "Sigorta konusu gerçekten çok önemli, vurgulamanız güzel olmuş."),
-                    ("Sibel Yaman",     "sibel.yaman@mail.com",    "BMW'yi tercih ettim ve hiç pişman olmadım!"),
-                    ("Koray Arslan",    "koray.arslan@mail.com",   "Bir sonraki yazıyı sabırsızlıkla bekliyorum."),
-                    ("Gizem Öz",        "gizem.oz@mail.com",       "Kapadokya gezimde bu yazıdan çok yararlandım."),
-                    ("Tolga Çevik",     "tolga.cevik@mail.com",    "Elektrikli araçlar hakkında merak ettiğim her şeyi öğrendim."),
-                    ("Pınar Güneş",     "pinar.gunes@mail.com",    "Avrupa seyahatimde büyük kolaylık sağladı, paylaşım için sağ olun."),
-                    ("Uğur Bulut",      "ugur.bulut@mail.com",     "Çok açıklayıcı ve anlaşılır kaleme alınmış."),
-                    ("Aysun Toprak",    "aysun.toprak@mail.com",   "Fiyatlar konusunu da eklerseniz süper olur."),
+    (
+        "Ali Vural",
+        "ali.vural@mail.com",
+        "https://randomuser.me/api/portraits/men/11.jpg",
+        "BMW incelemesi gerçekten başarılı hazırlanmış. Özellikle sürüş hissi kısmına katılıyorum."
+    ),
+
+    (
+        "Elif Kaplan",
+        "elif.kaplan@mail.com",
+        "https://randomuser.me/api/portraits/women/22.jpg",
+        "Elektrikli araçlarla ilgili bölüm oldukça açıklayıcı olmuş."
+    ),
+
+    (
+        "Hasan Demir",
+        "hasan.demir@mail.com",
+        "https://randomuser.me/api/portraits/men/33.jpg",
+        "Yakıt tüketimi değerleri benim deneyimime oldukça yakın çıktı."
+    ),
+
+    (
+        "Nuray Acar",
+        "nuray.acar@mail.com",
+        "https://randomuser.me/api/portraits/women/44.jpg",
+        "Kapadokya rotası için araç tavsiyesi kısmı işime yaradı."
+    ),
+
+    (
+        "Tarık Özkan",
+        "tarik.ozkan@mail.com",
+        "https://randomuser.me/api/portraits/men/55.jpg",
+        "Sigorta detaylarını çoğu firma açık anlatmıyor. Faydalı içerik olmuş."
+    ),
+
+    (
+        "Sibel Yaman",
+        "sibel.yaman@mail.com",
+        "https://randomuser.me/api/portraits/women/66.jpg",
+        "SUV karşılaştırması oldukça profesyonel hazırlanmış."
+    ),
+
+    (
+        "Koray Arslan",
+        "koray.arslan@mail.com",
+        "https://randomuser.me/api/portraits/men/77.jpg",
+        "BMW iX3 incelemesi beklediğimden detaylıydı."
+    ),
+
+    (
+        "Gizem Öz",
+        "gizem.oz@mail.com",
+        "https://randomuser.me/api/portraits/women/31.jpg",
+        "Uzun yol konforu konusunda güzel noktalara değinilmiş."
+    ),
+
+    (
+        "Tolga Çevik",
+        "tolga.cevik@mail.com",
+        "https://randomuser.me/api/portraits/men/41.jpg",
+        "Şehir içi kullanım için Corolla Hybrid gerçekten mantıklı görünüyor."
+    ),
+
+    (
+        "Pınar Güneş",
+        "pinar.gunes@mail.com",
+        "https://randomuser.me/api/portraits/women/52.jpg",
+        "Araç teslim süreçleriyle ilgili bilgiler oldukça faydalı olmuş."
+    ),
+
+    (
+        "Uğur Bulut",
+        "ugur.bulut@mail.com",
+        "https://randomuser.me/api/portraits/men/61.jpg",
+        "Yazı dili çok akıcı. Okurken sıkılmadım."
+    ),
+
+    (
+        "Aysun Toprak",
+        "aysun.toprak@mail.com",
+        "https://randomuser.me/api/portraits/women/73.jpg",
+        "Fiyat-performans açısından güzel öneriler paylaşılmış."
+    ),
+
+    (
+        "Mert Karaca",
+        "mert.karaca@mail.com",
+        "https://randomuser.me/api/portraits/men/15.jpg",
+        "Passat incelemesindeki uzun yol yorumları birebir doğru."
+    ),
+
+    (
+        "Buse Akın",
+        "buse.akin@mail.com",
+        "https://randomuser.me/api/portraits/women/18.jpg",
+        "Elektrikli araç şarj konusu sade şekilde anlatılmış."
+    ),
+
+    (
+        "Can Yıldırım",
+        "can.yildirim@mail.com",
+        "https://randomuser.me/api/portraits/men/24.jpg",
+        "Araç kiralama konusunda yeni başlayanlar için faydalı içerik."
+    ),
                 };
 
                 var rand = new Random(2025);
@@ -673,8 +764,9 @@ namespace OnionApp.Persistence.Context
                             BlogId = blog.Id,
                             Name = cp.name,
                             Email = cp.email,
+                            ImageUrl = cp.image,
                             Description = cp.text,
-                            CreatedDate = date.AddDays(cmtIdx * 3)
+                            CreatedDate = DateTime.Now.AddDays(-rand.Next(1, 180))
                         });
                         cmtIdx++;
                     }
@@ -692,7 +784,7 @@ namespace OnionApp.Persistence.Context
     {
         Title = "7/24 Müşteri Desteği",
         Description = "Günün her saati müşteri hizmetlerimize ulaşabilir, her türlü sorunuza anında yanıt alabilirsiniz.",
-        IconUrl = "flaticon-call-center"
+        IconUrl = "flaticon-24-hours"
     },
 
     new Service

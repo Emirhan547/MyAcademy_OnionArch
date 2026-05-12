@@ -1,22 +1,107 @@
 ﻿@model int
-<div class="comment-form-wrap pt-5">
-    <h3 class="mb-5">Bir Yorum Yapın</h3>
-    <form method="post" asp-action="AddComment" asp-controller="Blog" class="p-5 bg-light">
-        <div class="form-group">
-            <label for="name">Adınız Soyadınız *</label>
-            <input type="text" Name="Name" class="form-control" id="name">
+<div class="comment-form-wrap mt-5">
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-body p-5">
+
+            <div class="mb-4 text-center">
+                <h3 class="fw-bold mb-2">Bir Yorum Yapın</h3>
+                <p class="text-muted mb-0">
+                    Düşüncelerinizi bizimle paylaşın.
+                </p>
+            </div>
+
+            <form action="#" method="post">
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label for="name" class="form-label fw-semibold">
+                                Ad Soyad
+                            </label>
+                            <input type="text"
+                                   class="form-control custom-input"
+                                   id="name"
+                                   placeholder="Adınızı girin">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label for="email" class="form-label fw-semibold">
+                                E-Posta
+                            </label>
+                            <input type="email"
+                                   class="form-control custom-input"
+                                   id="email"
+                                   placeholder="ornek@mail.com">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="website" class="form-label fw-semibold">
+                        Website
+                    </label>
+                    <input type="url"
+                           class="form-control custom-input"
+                           id="website"
+                           placeholder="https://example.com">
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="message" class="form-label fw-semibold">
+                        Yorumunuz
+                    </label>
+                    <textarea id="message"
+                              rows="6"
+                              class="form-control custom-input"
+                              placeholder="Yorumunuzu yazın..."></textarea>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit"
+                            class="btn btn-primary px-5 py-3 rounded-pill shadow-sm">
+                        Yorumu Gönder
+                        <span class="icon-paper-plane ms-2"></span>
+                    </button>
+                </div>
+
+            </form>
         </div>
-        <input type="hidden" name="BlogId" value="@Model" />
-        <div class="form-group">
-            <label for="email">Email Adresi *</label>
-            <input type="email" Name="Email" class="form-control" id="email">
-        </div>
-        <div class="form-group">
-            <label for="message">Yorumunuz</label>
-            <textarea Name="Description" id="message" cols="30" rows="10" class="form-control"></textarea>
-        </div>
-        <div class="form-group">
-            <input type="submit" value="Yorum Yap" class="btn py-3 px-4 btn-primary">
-        </div>
-    </form>
+    </div>
 </div>
+
+<style>
+    .custom-input {
+        height: 55px;
+        border-radius: 14px;
+        border: 1px solid #e5e7eb;
+        padding: 12px 18px;
+        font-size: 15px;
+        transition: all .3s ease;
+        box-shadow: none;
+    }
+
+    textarea.custom-input {
+        height: auto;
+        resize: none;
+    }
+
+    .custom-input:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.15);
+    }
+
+    .comment-form-wrap .card {
+        background: #fff;
+    }
+
+    .comment-form-wrap .btn-primary {
+        font-weight: 600;
+        transition: all .3s ease;
+    }
+
+        .comment-form-wrap .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+</style>

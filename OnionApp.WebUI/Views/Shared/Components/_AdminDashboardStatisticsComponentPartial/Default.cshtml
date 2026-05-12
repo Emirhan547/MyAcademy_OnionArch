@@ -2,27 +2,38 @@
 @model DashboardStatsDto
 
 <div class="row">
+
     <div class="col-md-6 col-xl-3">
         <div class="card bg-primary border-primary">
             <div class="card-body">
+
                 <div class="mb-4">
                     <span class="badge badge-soft-light float-right">Aktif Araçlar</span>
                     <h5 class="card-title mb-0 text-white">Toplam Araç Sayısı</h5>
                 </div>
+
                 <div class="row d-flex align-items-center mb-4">
                     <div class="col-8">
                         <h2 class="d-flex align-items-center mb-0 text-white">
                             # @Model.CarCount
                         </h2>
                     </div>
+
                     <div class="col-4 text-right">
-                        <span class="text-white-50">@ViewBag.CarRandom % <i class="mdi mdi-arrow-up"></i></span>
+                        <span class="text-white-50">
+                            @ViewBag.CarRandom %
+                            <i class="mdi mdi-arrow-up"></i>
+                        </span>
                     </div>
                 </div>
 
                 <div class="progress badge-soft-light shadow-sm" style="height: 5px;">
-                    <div class="progress-bar bg-light" role="progressbar" style="width: @ViewBag.CarRandom%;"></div>
+                    <div class="progress-bar bg-light"
+                         role="progressbar"
+                         style="width: @ViewBag.CarRandom%;">
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -30,24 +41,34 @@
     <div class="col-md-6 col-xl-3">
         <div class="card bg-success border-success">
             <div class="card-body">
+
                 <div class="mb-4">
                     <span class="badge badge-soft-light float-right">Mevcut Lokasyonlar</span>
                     <h5 class="card-title mb-0 text-white">Lokasyon Sayısı</h5>
                 </div>
+
                 <div class="row d-flex align-items-center mb-4">
                     <div class="col-8">
                         <h2 class="d-flex align-items-center text-white mb-0">
                             # @Model.LocationCount
                         </h2>
                     </div>
+
                     <div class="col-4 text-right">
-                        <span class="text-white-50">@ViewBag.LocationRandom% <i class="mdi mdi-arrow-down"></i></span>
+                        <span class="text-white-50">
+                            @ViewBag.LocationRandom%
+                            <i class="mdi mdi-arrow-down"></i>
+                        </span>
                     </div>
                 </div>
 
                 <div class="progress badge-soft-light shadow-sm" style="height: 7px;">
-                    <div class="progress-bar bg-light" role="progressbar" style="width: @ViewBag.LocationRandom%;"></div>
+                    <div class="progress-bar bg-light"
+                         role="progressbar"
+                         style="width: @ViewBag.LocationRandom%;">
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -55,24 +76,34 @@
     <div class="col-md-6 col-xl-3">
         <div class="card bg-warning border-warning">
             <div class="card-body">
+
                 <div class="mb-4">
                     <span class="badge badge-soft-light float-right">Marka Sayısı</span>
                     <h5 class="card-title mb-0 text-white">Toplam Marka</h5>
                 </div>
+
                 <div class="row d-flex align-items-center mb-4">
                     <div class="col-8">
                         <h2 class="d-flex align-items-center text-white mb-0">
                             # @Model.BrandCount
                         </h2>
                     </div>
+
                     <div class="col-4 text-right">
-                        <span class="text-white-50">@ViewBag.BrandRandom% <i class="mdi mdi-arrow-up"></i></span>
+                        <span class="text-white-50">
+                            @ViewBag.BrandRandom%
+                            <i class="mdi mdi-arrow-up"></i>
+                        </span>
                     </div>
                 </div>
 
                 <div class="progress badge-soft-light shadow-sm" style="height: 7px;">
-                    <div class="progress-bar bg-light" role="progressbar" style="width: @ViewBag.BrandRandom%;"></div>
+                    <div class="progress-bar bg-light"
+                         role="progressbar"
+                         style="width: @ViewBag.BrandRandom%;">
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -80,44 +111,74 @@
     <div class="col-md-6 col-xl-3">
         <div class="card bg-info border-info">
             <div class="card-body">
+
                 <div class="mb-4">
                     <span class="badge badge-soft-light float-right">Kiralama Ücreti</span>
                     <h5 class="card-title mb-0 text-white">Günlük Kiralama</h5>
                 </div>
+
                 <div class="row d-flex align-items-center mb-4">
                     <div class="col-8">
                         <h2 class="d-flex align-items-center text-white mb-0">
                             ₺ @Model.AvgDaily
                         </h2>
                     </div>
+
                     <div class="col-4 text-right">
-                        <span class="text-white-50">@ViewBag.AvgDailyRandom% <i class="mdi mdi-arrow-down"></i></span>
+                        <span class="text-white-50">
+                            @ViewBag.AvgDailyRandom%
+                            <i class="mdi mdi-arrow-down"></i>
+                        </span>
                     </div>
                 </div>
 
                 <div class="progress badge-soft-light shadow-sm" style="height: 7px;">
-                    <div class="progress-bar bg-light" role="progressbar" style="width: @ViewBag.AvgDailyRandom%;"></div>
+                    <div class="progress-bar bg-light"
+                         role="progressbar"
+                         style="width: @ViewBag.AvgDailyRandom%;">
+                    </div>
                 </div>
+
             </div>
         </div>
-        <div class="col-md-6 col-xl-3">
-            <div class="card bg-dark border-dark">
-                <div class="card-body">
-                    <div class="mb-4">
-                        <span class="badge badge-soft-light float-right">Canlı</span>
-                        <h5 class="card-title mb-0 text-white">Bugün Gelen Rezervasyon</h5>
-                    </div>
-                    <div class="row d-flex align-items-center mb-4">
-                        <div class="col-8">
-                            <h2 id="today-reservation-count" class="d-flex align-items-center text-white mb-0"># @Model.TodayReservationCount</h2>
-                        </div>
-                        <div class="col-4 text-right">
-                            <span id="reservation-hub-status" class="text-white-50">Bağlanıyor...</span>
-                        </div>
-                    </div>
-                    <small class="text-white-50">SignalR bağlantı durumuna göre otomatik güncellenir.</small>
-                </div>
-            </div>
     </div>
-</div>
+
+    <!-- BURASI DÜZELTİLDİ -->
+    <div class="col-md-6 col-xl-3">
+        <div class="card bg-dark border-dark">
+            <div class="card-body">
+
+                <div class="mb-4">
+                    <span class="badge badge-soft-light float-right">Canlı</span>
+                    <h5 class="card-title mb-0 text-white">
+                        Bugün Gelen Rezervasyon
+                    </h5>
+                </div>
+
+                <div class="row d-flex align-items-center mb-4">
+
+                    <div class="col-8">
+                        <h2 id="today-reservation-count"
+                            class="d-flex align-items-center text-white mb-0">
+                            # @Model.TodayReservationCount
+                        </h2>
+                    </div>
+
+                    <div class="col-4 text-right">
+                        <span id="reservation-hub-status"
+                              class="text-white-50">
+                            Bağlanıyor...
+                        </span>
+                    </div>
+
+                </div>
+
+                <small class="text-white-50">
+                    SignalR bağlantı durumuna göre otomatik güncellenir.
+                </small>
+
+            </div>
+        </div>
+    </div>
+
 </div>

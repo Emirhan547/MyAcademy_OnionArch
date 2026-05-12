@@ -9,7 +9,10 @@ namespace OnionApp.WebUI.Areas.Admin.Controllers
         public async Task<IActionResult> Index(int id)
         {
             var response = await _service.GetCommentsByBlogId(id);
-            return response.IsSuccessful ? Ok(response) : BadRequest(response);
+
+            ViewBag.v = id;
+
+            return View(response.Data);
         }
     }
 }

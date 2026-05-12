@@ -12,7 +12,7 @@ using OnionApp.Persistence.Context;
 namespace OnionApp.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260511141148_mig1")]
+    [Migration("20260512141112_mig1")]
     partial class mig1
     {
         /// <inheritdoc />
@@ -552,6 +552,10 @@ namespace OnionApp.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
