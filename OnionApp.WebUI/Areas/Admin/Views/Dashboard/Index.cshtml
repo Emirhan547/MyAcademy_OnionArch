@@ -24,9 +24,7 @@
             "ApiSettings:SignalR:CarHubUrl is required."
         );
 
-    var jwtToken =
-        User.FindFirst("carbooktoken")?.Value
-        ?? string.Empty;
+  
 }
 
 <script src="~/Admin/plugins/chart-js/chart.min.js"></script>
@@ -236,9 +234,7 @@
 
     const connection = new signalR.HubConnectionBuilder()
 
-        .withUrl("@carHubUrl", {
-            accessTokenFactory: () => "@jwtToken"
-        })
+        .withUrl("@carHubUrl")
 
         .withAutomaticReconnect()
 
@@ -301,4 +297,4 @@
     }
 
 </script>
-```
+

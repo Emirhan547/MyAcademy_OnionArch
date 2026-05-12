@@ -1,88 +1,386 @@
 ﻿@model OnionApp.WebUI.Dtos.AiDtos.AdminContentAiRequestDto
 @using OnionApp.WebUI.Base
 @using OnionApp.WebUI.Dtos.AiDtos
+
 @{
     ViewData["Title"] = "AI Admin Asistanı";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+
     var result = ViewBag.AiResult as BaseResult<AiSuggestionDto>;
     var smartPricingRequest = ViewBag.SmartPricingRequest as SmartPricingAiRequestDto ?? new SmartPricingAiRequestDto();
     var smartPricingResult = ViewBag.SmartPricingResult as BaseResult<SmartPricingDto>;
 }
-<div class="row">
-    <div class="col-12">
-        <div class="page-title-box d-flex align-items-center justify-content-between">
-            <h4 class="mb-0 font-size-18">AI Admin İçerik ve Operasyon Asistanı</h4>
-        </div>
+
+<style>
+
+    .ai-gradient-card {
+        background: linear-gradient(135deg, #556ee6 0%, #34c38f 100%);
+        border-radius: 18px;
+        padding: 28px;
+        color: white;
+        margin-bottom: 24px;
+    }
+
+    .ai-panel {
+        border-radius: 18px;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0,0,0,.06);
+    }
+
+        .ai-panel .card-body {
+            padding: 28px;
+        }
+
+    .ai-tabs .nav-link {
+        border: none;
+        border-radius: 12px;
+        color: #555;
+        font-weight: 600;
+        padding: 12px 18px;
+        transition: .3s;
+    }
+
+        .ai-tabs .nav-link.active {
+            background: #556ee6;
+            color: white;
+        }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-control {
+        border-radius: 12px;
+        min-height: 48px;
+        border: 1px solid #e2e8f0;
+    }
+
+    textarea.form-control {
+        min-height: 120px;
+    }
+
+    .btn-modern {
+        border-radius: 12px;
+        padding: 12px 22px;
+        font-weight: 600;
+    }
+
+    .result-card {
+        border-radius: 18px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 4px 24px rgba(0,0,0,.08);
+    }
+
+    .result-header {
+        background: linear-gradient(135deg, #556ee6 0%, #34c38f 100%);
+        padding: 24px;
+        color: white;
+    }
+
+    .result-body {
+        padding: 24px;
+        background: white;
+    }
+
+    .factor-item {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 14px;
+        margin-bottom: 10px;
+    }
+
+    .empty-state {
+        border-radius: 18px;
+        background: white;
+        padding: 60px 30px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0,0,0,.05);
+    }
+
+</style>
+
+<div class="container-fluid">
+
+    <div class="ai-gradient-card">
+        <h2 class="mb-2 text-white">
+            AI Admin İçerik ve Operasyon Asistanı
+        </h2>
+
+        <p class="mb-0" style="opacity:.9;">
+            İçerik üretimi, kampanya önerileri ve ML.NET destekli akıllı fiyatlandırma işlemlerini yönetin.
+        </p>
     </div>
-</div>
-<div class="row">
-    <div class="col-lg-5">
-        <div class="card mb-3">
-            <div class="card-body">
-                <h5 class="card-title">İçerik İsteği</h5>
-                <form method="post" asp-action="Index">
-                    <div class="form-group"><label>İçerik Türü</label><input asp-for="ContentType" class="form-control" placeholder="Blog, kampanya, sosyal medya..." /></div>
-                    <div class="form-group"><label>Hedef Kitle</label><input asp-for="TargetAudience" class="form-control" placeholder="Aileler, iş seyahati, öğrenciler..." /></div>
-                    <div class="form-group"><label>Anahtar Kelimeler</label><input asp-for="Keywords" class="form-control" placeholder="ekonomik araç, havalimanı teslim..." /></div>
-                    <div class="form-group"><label>Ton</label><input asp-for="ToneOfVoice" class="form-control" /></div>
-                    <button type="submit" class="btn btn-primary">AI Fikir Üret</button>
-                </form>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Smart Pricing (ML.NET)</h5>
-                <form method="post" asp-action="SmartPricing">
-                    <div class="form-group"><label>Araç Tipi</label><input name="CarType" value="@smartPricingRequest.CarType" class="form-control" placeholder="SUV, Sedan, Hatchback..." /></div>
-                    <div class="form-group"><label>Sezon</label><input name="Season" value="@smartPricingRequest.Season" class="form-control" placeholder="low / normal / high" /></div>
-                    <div class="form-group"><label>Lokasyon</label><input name="Location" value="@smartPricingRequest.Location" class="form-control" placeholder="istanbul, ankara, izmir" /></div>
-                    <div class="form-group"><label>KM</label><input name="Km" type="number" value="@smartPricingRequest.Km" class="form-control" /></div>
-                    <div class="form-group"><label>Yakıt</label><input name="Fuel" value="@smartPricingRequest.Fuel" class="form-control" placeholder="benzin, dizel, elektrik" /></div>
-                    <div class="form-group"><label>Geçmiş Talep Endeksi (0-100)</label><input name="HistoricalDemandIndex" type="number" min="0" max="100" value="@smartPricingRequest.HistoricalDemandIndex" class="form-control" /></div>
-                    <button type="submit" class="btn btn-success">Smart Fiyat Öner</button>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-7">
-        @if (smartPricingResult?.Data != null)
-        {
-            <div class="card mb-3 border-success">
+
+    <div class="row">
+
+        <!-- LEFT -->
+        <div class="col-xl-5">
+
+            <div class="card ai-panel">
+
                 <div class="card-body">
-                    <h4>@smartPricingResult.Data.Title</h4>
-                    <h3 class="text-success">@smartPricingResult.Data.SuggestedDailyPrice @smartPricingResult.Data.Currency / Gün</h3>
-                    <p>@smartPricingResult.Data.Summary</p>
-                    <ul class="list-group">
+
+                    <ul class="nav nav-pills ai-tabs mb-4" id="aiTab" role="tablist">
+
+                        <li class="nav-item mr-2">
+                            <a class="nav-link active"
+                                   data-toggle="pill"
+                                   href="#contentTab">
+                                İçerik AI
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link"
+                                   data-toggle="pill"
+                                   href="#pricingTab">
+                                Smart Pricing
+                            </a>
+                        </li>
+
+                    </ul>
+
+                    <div class="tab-content">
+
+                        <!-- CONTENT TAB -->
+                        <div class="tab-pane fade show active" id="contentTab">
+
+                            <form method="post" asp-action="Index">
+
+                                <div class="form-group">
+                                    <label>İçerik Türü</label>
+                                    <input asp-for="ContentType"
+                                           class="form-control"
+                                           placeholder="Blog, kampanya, sosyal medya..." />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Hedef Kitle</label>
+                                    <input asp-for="TargetAudience"
+                                           class="form-control"
+                                           placeholder="Aileler, öğrenciler..." />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Anahtar Kelimeler</label>
+                                    <input asp-for="Keywords"
+                                           class="form-control"
+                                           placeholder="ekonomik araç, SUV, havalimanı..." />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Ton</label>
+                                    <input asp-for="ToneOfVoice"
+                                           class="form-control"
+                                           placeholder="Profesyonel, samimi..." />
+                                </div>
+
+                                <button type="submit"
+                                        class="btn btn-primary btn-modern btn-block">
+                                    <i class="mdi mdi-robot mr-1"></i>
+                                    AI İçerik Üret
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                        <!-- SMART PRICING -->
+                        <div class="tab-pane fade" id="pricingTab">
+
+                            <form method="post" asp-action="SmartPricing">
+
+                                <div class="form-group">
+                                    <label>Araç Tipi</label>
+                                    <input name="CarType"
+                                           value="@smartPricingRequest.CarType"
+                                           class="form-control"
+                                           placeholder="SUV, Sedan..." />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Sezon</label>
+                                    <input name="Season"
+                                           value="@smartPricingRequest.Season"
+                                           class="form-control"
+                                           placeholder="low / normal / high" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Lokasyon</label>
+                                    <input name="Location"
+                                           value="@smartPricingRequest.Location"
+                                           class="form-control"
+                                           placeholder="İstanbul, Ankara..." />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>KM</label>
+                                    <input name="Km"
+                                           type="number"
+                                           value="@smartPricingRequest.Km"
+                                           class="form-control" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Yakıt</label>
+                                    <input name="Fuel"
+                                           value="@smartPricingRequest.Fuel"
+                                           class="form-control"
+                                           placeholder="Benzin, Dizel..." />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Talep Endeksi</label>
+                                    <input name="HistoricalDemandIndex"
+                                           type="number"
+                                           min="0"
+                                           max="100"
+                                           value="@smartPricingRequest.HistoricalDemandIndex"
+                                           class="form-control" />
+                                </div>
+
+                                <button type="submit"
+                                        class="btn btn-success btn-modern btn-block">
+                                    <i class="mdi mdi-chart-line mr-1"></i>
+                                    Smart Fiyat Hesapla
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="col-xl-7">
+
+            @if (smartPricingResult?.Data != null)
+            {
+                <div class="result-card mb-4">
+
+                    <div class="result-header">
+
+                        <div class="d-flex justify-content-between align-items-center">
+
+                            <div>
+                                <h3 class="text-white mb-1">
+                                    @smartPricingResult.Data.Title
+                                </h3>
+
+                                <p class="mb-0" style="opacity:.8;">
+                                    ML.NET Akıllı Fiyat Analizi
+                                </p>
+                            </div>
+
+                            <div class="text-right">
+                                <h2 class="text-white mb-0">
+                                    @smartPricingResult.Data.SuggestedDailyPrice
+                                    @smartPricingResult.Data.Currency
+                                </h2>
+
+                                <small>/ günlük</small>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="result-body">
+
+                        <p class="mb-4">
+                            @smartPricingResult.Data.Summary
+                        </p>
+
                         @foreach (var factor in smartPricingResult.Data.PriceFactors)
                         {
-                            <li class="list-group-item">@factor</li>
+                            <div class="factor-item">
+                                <i class="mdi mdi-check-circle text-success mr-2"></i>
+                                @factor
+                            </div>
                         }
-                    </ul>
-                </div>
-            </div>
-        }
-        @if (result?.Data != null)
-        {
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h4>@result.Data.Title</h4>
-                        <span class="badge badge-info">@result.Data.Source</span>
+
                     </div>
-                    <p>@result.Data.Summary</p>
-                    <ul class="list-group">
+
+                </div>
+            }
+
+            @if (result?.Data != null)
+            {
+                <div class="result-card">
+
+                    <div class="result-header">
+
+                        <div class="d-flex justify-content-between align-items-center">
+
+                            <div>
+                                <h3 class="text-white mb-1">
+                                    @result.Data.Title
+                                </h3>
+
+                                <p class="mb-0">
+                                    AI İçerik Önerisi
+                                </p>
+                            </div>
+
+                            <span class="badge badge-light px-3 py-2">
+                                @result.Data.Source
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="result-body">
+
+                        <p class="mb-4">
+                            @result.Data.Summary
+                        </p>
+
                         @foreach (var suggestion in result.Data.Suggestions)
                         {
-                            <li class="list-group-item">@suggestion</li>
+                            <div class="factor-item">
+                                <i class="mdi mdi-lightbulb-outline text-warning mr-2"></i>
+                                @suggestion
+                            </div>
                         }
-                    </ul>
-                    <small class="text-warning d-block mt-3">@result.Data.Disclaimer</small>
+
+                        <div class="alert alert-warning mt-4 mb-0">
+                            @result.Data.Disclaimer
+                        </div>
+
+                    </div>
+
                 </div>
-            </div>
-        }
-        else if (smartPricingResult?.Data == null)
-        {
-            <div class="alert alert-info">Dashboard metriklerini kullanarak blog, kampanya ve operasyon önerisi üretmek veya ML.NET smart pricing hesaplamak için formu doldurun.</div>
-        }
+            }
+
+            @if (result?.Data == null && smartPricingResult?.Data == null)
+            {
+                <div class="empty-state">
+
+                    <i class="mdi mdi-robot-outline"
+                       style="font-size:70px;color:#556ee6;"></i>
+
+                    <h3 class="mt-4">
+                        AI Asistan Hazır
+                    </h3>
+
+                    <p class="text-muted mb-0">
+                        Sol taraftan içerik üretimi veya smart pricing işlemini başlatabilirsiniz.
+                    </p>
+
+                </div>
+            }
+
+        </div>
+
     </div>
+
 </div>

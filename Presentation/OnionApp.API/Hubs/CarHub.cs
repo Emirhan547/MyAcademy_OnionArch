@@ -6,7 +6,7 @@ using OnionApp.Application.Features.Queries.StatisticsQueries;
 
 namespace OnionApp.API.Hubs
 {
-    [Authorize(Policy = PolicyNames.EmployeeOnly)]
+    [AllowAnonymous]
     public class CarHub : Hub<ICarClient>
     {
              
