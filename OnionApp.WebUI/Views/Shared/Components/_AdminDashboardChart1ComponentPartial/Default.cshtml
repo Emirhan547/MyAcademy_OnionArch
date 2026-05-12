@@ -1,19 +1,78 @@
-﻿@using OnionApp.WebUI.Models
+﻿
+@using OnionApp.WebUI.Models
 @model DashboardViewModel
 
-   
+<div class="card h-100 border-0 shadow-sm">
+    <div class="card-body">
 
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="card-title mb-0">
+                Fiyat Ortalamaları
+            </h5>
 
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="card-title mb-0">Fiyat Ortalamaları</h5>
-                        <span class="badge badge-soft-primary">Dinamik</span>
-                    </div>
-                    <canvas id="priceAveragesChart" height="180"></canvas>
-                </div>
-            </div>
+            <span class="badge bg-primary-subtle text-primary">
+                Dinamik
+            </span>
+        </div>
 
-            <script>
-                            (()=>{const el=document.getElementById("priceAveragesChart"); if(!el||typeof Chart==="undefined")return; new Chart(el,{type:"bar",data:{labels:["Günlük","Haftalık","Aylık"],datasets:[{label:"₺ Ortalama",data:[@Model.AvgDailyPrice,@Model.AvgWeeklyPrice,@Model.AvgMonthlyPrice],backgroundColor:["rgba(59,130,246,.8)","rgba(16,185,129,.8)","rgba(249,115,22,.8)"]}]},options:{responsive:true,plugins:{legend:{display:false}}}});})();
-            </script>
+        <div style="height:320px;">
+            <canvas id="priceAveragesChart"></canvas>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    (() => {
+
+        const el = document.getElementById("priceAveragesChart");
+
+        if (!el || typeof Chart === "undefined")
+            return;
+
+        new Chart(el, {
+            type: "bar",
+
+            data: {
+                labels: ["Günlük", "Haftalık", "Aylık"],
+
+                datasets: [{
+                    label: "₺ Ortalama",
+
+                    data: [
+                        @Model.AvgDailyPrice,
+                        @Model.AvgWeeklyPrice,
+                        @Model.AvgMonthlyPrice
+                    ],
+
+                    backgroundColor: [
+                        "rgba(59,130,246,.85)",
+                        "rgba(16,185,129,.85)",
+                        "rgba(249,115,22,.85)"
+                    ],
+
+                    borderRadius: 10
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+    })();
+</script>
+```

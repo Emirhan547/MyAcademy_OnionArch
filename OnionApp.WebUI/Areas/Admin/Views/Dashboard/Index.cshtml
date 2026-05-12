@@ -1,83 +1,304 @@
-﻿@inject IConfiguration Configuration
+﻿
+@inject IConfiguration Configuration
 @using OnionApp.WebUI.Models
+
 @model DashboardViewModel
+
 @{
     ViewData["Title"] = "Dashboard";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+
     var fuelTotal = Model.ElectricCount + Model.GasOrDieselCount;
-    var electricRate = fuelTotal == 0 ? 0 : Math.Round((double)Model.ElectricCount / fuelTotal * 100, 1);
-    var autoRate = Model.CarCount == 0 ? 0 : Math.Round((double)Model.AutoTransmissionCount / Model.CarCount * 100, 1);
-    var carHubUrl = Configuration["ApiSettings:SignalR:CarHubUrl"] ?? throw new InvalidOperationException("ApiSettings:SignalR:CarHubUrl is required.");
-    var jwtToken = User.FindFirst("carbooktoken")?.Value ?? string.Empty;
+
+    var electricRate = fuelTotal == 0
+        ? 0
+        : Math.Round((double)Model.ElectricCount / fuelTotal * 100, 1);
+
+    var autoRate = Model.CarCount == 0
+        ? 0
+        : Math.Round((double)Model.AutoTransmissionCount / Model.CarCount * 100, 1);
+
+    var carHubUrl =
+        Configuration["ApiSettings:SignalR:CarHubUrl"]
+        ?? throw new InvalidOperationException(
+            "ApiSettings:SignalR:CarHubUrl is required."
+        );
+
+    var jwtToken =
+        User.FindFirst("carbooktoken")?.Value
+        ?? string.Empty;
 }
+
 <script src="~/Admin/plugins/chart-js/chart.min.js"></script>
 <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+<style>
+
+    .dashboard-spacing > div {
+        padding: 12px !important;
+    }
+
+</style>
 <div class="page-content">
+
     <div class="container-fluid">
+
+        <!-- HERO -->
+
         <div class="row mb-4">
+
             <div class="col-12">
-                <div class="card" style="background: linear-gradient(135deg, #4f46e5, #06b6d4); color: #fff; border: none;">
-                    <div class="card-body py-4 d-flex flex-wrap justify-content-between align-items-center">
+
+                <div class="card border-0 shadow-sm"
+                     style="background:linear-gradient(135deg,#4f46e5,#06b6d4);">
+
+                    <div class="card-body py-3 px-4 text-white d-flex flex-wrap justify-content-between align-items-center">
+
                         <div>
-                            <h2 class="mb-1">Admin Control Center</h2>
-                            <p class="mb-0">Filo, fiyat ve içerik performansı canlı istatistiklerle anlık takip edilir.</p>
+
+                            <h2 class="fw-bold mb-2">
+                                Admin Control Center
+                            </h2>
+
+                            <p class="mb-0 text-white-50">
+                                Filo, fiyat ve operasyon verileri canlı takip edilir.
+                            </p>
+
                         </div>
+
                         <div class="text-end mt-3 mt-md-0">
-                            <h3 class="mb-0"><span id="liveCarCount">@Model.CarCount</span> Araç</h3>
-                            <small>@Model.BrandCount Marka • @Model.LocationCount Lokasyon</small>
+
+                            <h3 class="fw-bold mb-1">
+                                <span id="liveCarCount">
+                                    @Model.CarCount
+                                </span>
+                                Araç
+                            </h3>
+
+                            <small class="text-white-50">
+                                @Model.BrandCount Marka
+                                •
+                                @Model.LocationCount Lokasyon
+                            </small>
+
                         </div>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
+
+        <!-- KPI -->
         @await Component.InvokeAsync("_AdminDashboardStatisticsComponentPartial")
-        <div class="row mt-3">
-            <div class="col-lg-4 mb-3">
+
+        <!-- CHARTS -->
+
+        <div class="row g-3 mb-4">
+
+            <div class="col-lg-4">
                 @await Component.InvokeAsync("_AdminDashboardChart1ComponentPartial")
             </div>
-            <div class="col-lg-4 mb-3">
+
+            <div class="col-lg-4">
                 @await Component.InvokeAsync("_AdminDashboardChart2ComponentPartial")
             </div>
-            <div class="col-lg-4 mb-3">
+
+            <div class="col-lg-4">
                 @await Component.InvokeAsync("_AdminDashboardChart3ComponentPartial")
             </div>
+
         </div>
 
-        <div class="row mt-2">
-            <div class="col-lg-12"><div class="card h-100"><div class="card-body"><h4 class="card-title">Operasyon Özeti</h4><p class="mb-1">Otomatik Vites Oranı: <strong>%@autoRate</strong></p><div class="progress mb-3"><div class="progress-bar bg-primary" style="width:@autoRate%"></div></div><p class="mb-1">Elektrikli Filo Oranı: <strong>%@electricRate</strong></p><div class="progress mb-3"><div class="progress-bar bg-success" style="width:@electricRate%"></div></div><p class="mb-0 text-muted">1000 km altı araç sayısı: <strong>@Model.UnderThousandKmCount</strong></p></div></div></div>
-        </div>
+        <!-- BOTTOM INFO -->
 
-        <div class="row mt-2">
-           
+        <div class="row g-3">
+
             <div class="col-lg-6">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h4 class="card-title mb-3">Dashboard Durumu</h4>
-                        <div class="d-flex justify-content-between mb-2"><span>Canlı araç sayacı</span><strong id="carHubState">Bağlanıyor...</strong></div>
-                        <div class="d-flex justify-content-between mb-2"><span>Son panel yenileme</span><strong id="dashboard-refresh-time">-</strong></div>
-                        <div class="alert alert-light border mt-3 mb-0">İpucu: Rezervasyon kartı ve bildirim zili yeni rezervasyon geldikçe otomatik güncellenir.</div>
+
+                <div class="card border-0 shadow-sm h-100">
+
+                    <div class="card-body p-4">
+
+                        <h5 class="fw-semibold mb-4">
+                            Operasyon Özeti
+                        </h5>
+
+                        <div class="mb-3">
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Otomatik Vites</span>
+                                <strong>%@autoRate</strong>
+                            </div>
+
+                            <div class="progress"
+                                 style="height:8px;">
+
+                                <div class="progress-bar bg-primary"
+                                     style="width:@autoRate%">
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="mb-4">
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Elektrikli Filo</span>
+                                <strong>%@electricRate</strong>
+                            </div>
+
+                            <div class="progress"
+                                 style="height:8px;">
+
+                                <div class="progress-bar bg-success"
+                                     style="width:@electricRate%">
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+
+                            <span class="text-muted">
+                                1000 KM Altı Araç
+                            </span>
+
+                            <strong>
+                                @Model.UnderThousandKmCount
+                            </strong>
+
+                        </div>
+
                     </div>
+
                 </div>
+
             </div>
+
+            <div class="col-lg-6">
+
+                <div class="card border-0 shadow-sm h-100">
+
+                    <div class="card-body p-4">
+
+                        <h5 class="fw-semibold mb-4">
+                            Dashboard Durumu
+                        </h5>
+
+                        <div class="d-flex justify-content-between mb-3">
+
+                            <span>
+                                Canlı Araç Sayacı
+                            </span>
+
+                            <strong id="carHubState">
+                                Bağlanıyor...
+                            </strong>
+
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-3">
+
+                            <span>
+                                Son Panel Yenileme
+                            </span>
+
+                            <strong id="dashboard-refresh-time">
+                                -
+                            </strong>
+
+                        </div>
+
+                        <div class="alert alert-light border rounded-3 mb-0">
+
+                            Rezervasyon kartları ve dashboard verileri
+                            SignalR ile otomatik güncellenmektedir.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
+
     </div>
+
 </div>
+
 <script>
+
     const connection = new signalR.HubConnectionBuilder()
-         .withUrl("@carHubUrl", { accessTokenFactory: () => "@jwtToken" })
-         .withAutomaticReconnect()
-         .build();
+
+        .withUrl("@carHubUrl", {
+            accessTokenFactory: () => "@jwtToken"
+        })
+
+        .withAutomaticReconnect()
+
+        .build();
 
     connection.on("ReceiveCarCount", (value) => {
-         document.getElementById("liveCarCount").textContent = value;
-    });
-   
-    connection.onreconnecting(() => { const el = document.getElementById('carHubState'); if(el) el.textContent='Yeniden bağlanıyor...'; });
-    connection.onreconnected(() => { const el = document.getElementById('carHubState'); if(el) el.textContent='Bağlı'; });
-    connection.start().then(() => { const el = document.getElementById('carHubState'); if(el) el.textContent='Bağlı'; }).catch((err) => { const el = document.getElementById('carHubState'); if(el) el.textContent='Bağlanamadı'; console.error(err); });
 
-    const refresh = document.getElementById('dashboard-refresh-time');
+        document.getElementById("liveCarCount").textContent = value;
+
+    });
+
+    connection.onreconnecting(() => {
+
+        const el = document.getElementById("carHubState");
+
+        if (el)
+            el.textContent = "Yeniden bağlanıyor...";
+
+    });
+
+    connection.onreconnected(() => {
+
+        const el = document.getElementById("carHubState");
+
+        if (el)
+            el.textContent = "Bağlı";
+
+    });
+
+    connection.start()
+
+        .then(() => {
+
+            const el = document.getElementById("carHubState");
+
+            if (el)
+                el.textContent = "Bağlı";
+
+        })
+
+        .catch((err) => {
+
+            const el = document.getElementById("carHubState");
+
+            if (el)
+                el.textContent = "Bağlanamadı";
+
+            console.error(err);
+
+        });
+
+    const refresh =
+        document.getElementById("dashboard-refresh-time");
+
     if (refresh) {
-        refresh.textContent = new Date().toLocaleString('tr-TR');
+
+        refresh.textContent =
+            new Date().toLocaleString("tr-TR");
+
     }
+
 </script>
+```
