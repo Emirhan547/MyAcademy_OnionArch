@@ -1,12 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using OnionApp.WebUI.Models;
+using OnionApp.WebUI.Services.StatisticsServices;
 
 namespace OnionApp.WebUI.ViewComponents.DashboardViewComponents
 {
-    public class _AdminDashboardChart2ComponentPartial:ViewComponent
+    public class _AdminDashboardChart2ComponentPartial(IStatisticsService statisticsService) : ViewComponent
     {
-        public IViewComponentResult Invoke()
+        public async Task<IViewComponentResult> InvokeAsync()
         {
-            return View();
+            var model = new DashboardViewModel
+            {
+                ElectricCount = (await statisticsService.GetCarCountByFuelElectric()).Data,
+                GasOrDieselCount = (await statisticsService.GetCarCountByFuelGasolineOrDiesel()).Data
+            };
+
+            return View(model);
         }
     }
 }
