@@ -12,7 +12,7 @@ using OnionApp.Persistence.Context;
 namespace OnionApp.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260512164937_mig1")]
+    [Migration("20260513114422_mig1")]
     partial class mig1
     {
         /// <inheritdoc />

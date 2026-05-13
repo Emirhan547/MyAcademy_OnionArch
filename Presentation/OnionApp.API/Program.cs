@@ -139,7 +139,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         {
             var accessToken = context.Request.Query["access_token"];
             var path = context.HttpContext.Request.Path;
-            if (!string.IsNullOrWhiteSpace(accessToken) && path.StartsWithSegments("/carhub"))
+            if (!string.IsNullOrWhiteSpace(accessToken) && (path.StartsWithSegments("/carhub") || path.StartsWithSegments("/reservationhub")))
             {
                 context.Token = accessToken;
             }
@@ -197,6 +197,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<CarHub>("/carhub");
+app.MapHub<ReservationHub>("/reservationhub");
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
