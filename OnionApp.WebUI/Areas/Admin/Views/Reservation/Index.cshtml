@@ -1,46 +1,556 @@
 ﻿@model List<OnionApp.WebUI.Dtos.ReservationDtos.ResultReservationDto>
+
 @{
     ViewData["Title"] = "Rezervasyon Operasyon";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+
     var active = Model.Where(x => x.Status == "Rented" || x.Status == "Pending").ToList();
-    var todayReturns = Model.Where(x => x.ReturnDate.HasValue && x.ReturnDate.Value.Date == DateTime.Today && x.Status != "Completed").ToList();
+    var todayReturns = Model.Where(x => x.ReturnDate.HasValue &&
+                                   x.ReturnDate.Value.Date == DateTime.Today &&
+                                   x.Status != "Completed").ToList();
 }
 
-<h3>Aktif Kiralamalar (@active.Count)</h3>
-<table class="table table-bordered">
-    <tr><th>Müşteri</th><th>Araç</th><th>Durum</th><th>Planlanan İade</th><th>Teslim Et</th><th>İade Al</th></tr>
-    @foreach (var item in active)
-    {
-        <tr>
-            <td>@item.Name @item.Surname</td>
-            <td>@item.CarID</td>
-            <td>@item.Status</td>
-            <td>@item.ReturnDate?.ToString("dd.MM.yyyy")</td>
-            <td>
-                <form asp-action="CheckOut" method="post" class="d-flex gap-1">
-                    <input type="hidden" name="ReservationId" value="@item.Id" />
-                    <input type="number" name="StartKilometer" placeholder="KM" class="form-control" required />
-                    <input type="number" name="StartFuelLevel" placeholder="Yakıt(0-100)" class="form-control" required />
-                    <button class="btn btn-warning">Teslim Et</button>
-                </form>
-            </td>
-            <td>
-                <form asp-action="CheckIn" method="post" class="d-flex gap-1">
-                    <input type="hidden" name="ReservationId" value="@item.Id" />
-                    <input type="number" name="EndKilometer" placeholder="KM" class="form-control" required />
-                    <input type="number" name="EndFuelLevel" placeholder="Yakıt(0-100)" class="form-control" required />
-                    <input type="number" step="0.01" name="ExtraChargeAmount" placeholder="Ek Ücret" class="form-control" />
-                    <button class="btn btn-success">İade Al</button>
-                </form>
-            </td>
-        </tr>
+<style>
+    :root {
+        --primary: #6366f1;
+        --primary-light: #eef2ff;
+        --success: #10b981;
+        --success-light: #ecfdf5;
+        --warning: #f59e0b;
+        --warning-light: #fffbeb;
+        --danger: #ef4444;
+        --dark: #0f172a;
+        --gray: #64748b;
+        --border: #e2e8f0;
+        --surface: #ffffff;
+        --bg: #f8fafc;
     }
-</table>
 
-<h3>Bugün İade Beklenenler (@todayReturns.Count)</h3>
-<ul>
-    @foreach (var item in todayReturns)
-    {
-        <li>#@item.Id - @item.Name @item.Surname - Araç:@item.CarID</li>
+    body {
+        background: var(--bg);
     }
-</ul>
+
+    .reservation-header {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        border-radius: 28px;
+        padding: 40px;
+        margin-bottom: 28px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 45px rgba(79, 70, 229, 0.20);
+    }
+
+        .reservation-header::before {
+            content: "";
+            position: absolute;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.08);
+            right: -80px;
+            top: -100px;
+        }
+
+        .reservation-header::after {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.05);
+            left: -40px;
+            bottom: -70px;
+        }
+
+    .reservation-header-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .reservation-title {
+        color: white;
+        font-size: 34px;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .reservation-subtitle {
+        color: rgba(255,255,255,.9);
+        font-size: 15px;
+        max-width: 700px;
+        line-height: 1.7;
+        margin-bottom: 0;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 22px;
+        padding: 28px;
+        border: 1px solid #edf2f7;
+        box-shadow: 0 10px 30px rgba(15,23,42,.05);
+        transition: .25s ease;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+        }
+
+    .stat-label {
+        color: var(--gray);
+        font-size: 14px;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    .stat-value {
+        font-size: 36px;
+        font-weight: 800;
+        color: var(--dark);
+        line-height: 1;
+    }
+
+    .active-card {
+        border-left: 5px solid var(--primary);
+    }
+
+    .return-card {
+        border-left: 5px solid var(--warning);
+    }
+
+    .modern-card {
+        background: white;
+        border-radius: 24px;
+        border: 1px solid #edf2f7;
+        box-shadow: 0 10px 35px rgba(15,23,42,.05);
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+
+    .card-header-modern {
+        padding: 24px 28px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card-title-modern {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--dark);
+    }
+
+    .badge-modern {
+        background: var(--primary-light);
+        color: var(--primary);
+        padding: 10px 16px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .table {
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+
+        .table thead {
+            background: #f8fafc;
+        }
+
+            .table thead th {
+                border: none;
+                padding: 18px;
+                font-size: 13px;
+                text-transform: uppercase;
+                letter-spacing: .5px;
+                color: var(--gray);
+                font-weight: 700;
+                white-space: nowrap;
+            }
+
+        .table tbody tr {
+            transition: .2s ease;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+            .table tbody tr:hover {
+                background: #f8fbff;
+            }
+
+        .table tbody td {
+            padding: 22px 18px;
+            border: none;
+            vertical-align: middle;
+        }
+
+    .customer-box {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .customer-name {
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 4px;
+    }
+
+    .car-badge {
+        display: inline-flex;
+        padding: 8px 14px;
+        border-radius: 12px;
+        background: #f1f5f9;
+        color: var(--dark);
+        font-weight: 700;
+        font-size: 13px;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 9px 14px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .status-rented {
+        background: var(--success-light);
+        color: var(--success);
+    }
+
+    .status-pending {
+        background: var(--warning-light);
+        color: var(--warning);
+    }
+
+    .date-box {
+        font-weight: 700;
+        color: var(--dark);
+    }
+
+    .operation-form {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+        .operation-form input {
+            min-width: 120px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            padding: 12px 14px;
+            box-shadow: none !important;
+            transition: .2s ease;
+        }
+
+            .operation-form input:focus {
+                border-color: var(--primary);
+            }
+
+    .modern-btn {
+        border: none;
+        border-radius: 14px;
+        padding: 12px 18px;
+        font-size: 13px;
+        font-weight: 700;
+        transition: .2s ease;
+        white-space: nowrap;
+    }
+
+    .btn-checkout {
+        background: var(--warning);
+        color: white;
+    }
+
+    .btn-checkin {
+        background: var(--success);
+        color: white;
+    }
+
+    .modern-btn:hover {
+        transform: translateY(-2px);
+        opacity: .95;
+    }
+
+    .return-list {
+        padding: 25px;
+    }
+
+    .return-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 20px;
+        border: 1px solid #edf2f7;
+        border-radius: 18px;
+        margin-bottom: 15px;
+        transition: .2s ease;
+    }
+
+        .return-item:hover {
+            background: #fafcff;
+        }
+
+    .return-user {
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 5px;
+    }
+
+    .return-car {
+        color: var(--gray);
+        font-size: 14px;
+    }
+
+    .return-id {
+        background: var(--warning-light);
+        color: var(--warning);
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    @@media(max-width:1200px) {
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .operation-form {
+            min-width: 550px;
+        }
+    }
+
+    @@media(max-width:768px) {
+        .reservation-header {
+            padding: 30px 24px;
+        }
+
+        .reservation-title {
+            font-size: 28px;
+        }
+
+        .card-header-modern {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .return-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+    }
+</style>
+
+<div class="page-content">
+    <div class="container-fluid">
+
+        <div class="reservation-header">
+            <div class="reservation-header-content">
+                <h1 class="reservation-title">
+                    Rezervasyon Operasyon Merkezi
+                </h1>
+
+                <p class="reservation-subtitle">
+                    Aktif araç kiralamalarını takip edebilir, teslim ve iade işlemlerini
+                    hızlı şekilde yönetebilir, günlük operasyonları tek panel üzerinden kontrol edebilirsiniz.
+                </p>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+
+            <div class="stat-card active-card">
+                <div class="stat-label">Aktif Kiralamalar</div>
+                <div class="stat-value">@active.Count</div>
+            </div>
+
+            <div class="stat-card return-card">
+                <div class="stat-label">Bugün İade Beklenen</div>
+                <div class="stat-value">@todayReturns.Count</div>
+            </div>
+
+        </div>
+
+        <div class="modern-card">
+
+            <div class="card-header-modern">
+                <h3 class="card-title-modern">Aktif Kiralamalar</h3>
+
+                <span class="badge-modern">
+                    @active.Count Aktif Rezervasyon
+                </span>
+            </div>
+
+            <div class="table-responsive">
+
+                <table class="table align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>Müşteri</th>
+                            <th>Araç</th>
+                            <th>Durum</th>
+                            <th>Planlanan İade</th>
+                            <th>Teslim İşlemi</th>
+                            <th>İade İşlemi</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in active)
+                        {
+                            var statusClass = item.Status == "Rented"
+                            ? "status-rented"
+                            : "status-pending";
+
+                            <tr>
+
+                                <td>
+                                    <div class="customer-box">
+                                        <span class="customer-name">
+                                            @item.Name @item.Surname
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span class="car-badge">
+                                        Araç #@item.CarId
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="status-badge @statusClass">
+                                        @item.Status
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <div class="date-box">
+                                        @item.ReturnDate?.ToString("dd.MM.yyyy")
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <form asp-action="CheckOut"
+                                          method="post"
+                                          class="operation-form">
+
+                                        <input type="hidden"
+                                               name="ReservationId"
+                                               value="@item.Id" />
+
+                                        <input type="number"
+                                               name="StartKilometer"
+                                               placeholder="Başlangıç KM"
+                                               required />
+
+                                        <input type="number"
+                                               name="StartFuelLevel"
+                                               placeholder="Yakıt %"
+                                               required />
+
+                                        <button class="modern-btn btn-checkout">
+                                            Teslim Et
+                                        </button>
+
+                                    </form>
+                                </td>
+
+                                <td>
+                                    <form asp-action="CheckIn"
+                                          method="post"
+                                          class="operation-form">
+
+                                        <input type="hidden"
+                                               name="ReservationId"
+                                               value="@item.Id" />
+
+                                        <input type="number"
+                                               name="EndKilometer"
+                                               placeholder="Bitiş KM"
+                                               required />
+
+                                        <input type="number"
+                                               name="EndFuelLevel"
+                                               placeholder="Yakıt %"
+                                               required />
+
+                                        <input type="number"
+                                               step="0.01"
+                                               name="ExtraChargeAmount"
+                                               placeholder="Ek Ücret" />
+
+                                        <button class="modern-btn btn-checkin">
+                                            İade Al
+                                        </button>
+
+                                    </form>
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+        <div class="modern-card">
+
+            <div class="card-header-modern">
+                <h3 class="card-title-modern">
+                    Bugün İade Beklenenler
+                </h3>
+
+                <span class="badge-modern">
+                    @todayReturns.Count Kayıt
+                </span>
+            </div>
+
+            <div class="return-list">
+
+                @foreach (var item in todayReturns)
+                {
+                    <div class="return-item">
+
+                        <div>
+                            <div class="return-user">
+                                @item.Name @item.Surname
+                            </div>
+
+                            <div class="return-car">
+                                Araç ID: @item.CarId
+                            </div>
+                        </div>
+
+                        <div class="return-id">
+                            Rezervasyon #@item.Id
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+</div>

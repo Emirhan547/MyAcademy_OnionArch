@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using OnionApp.WebUI.Dtos.ReservationDtos;
 using OnionApp.WebUI.Services.ReservationServices;
 
 namespace OnionApp.WebUI.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize]
     public class ReservationController(IReservationService _service) : Controller
     {
         public async Task<IActionResult> Index() 

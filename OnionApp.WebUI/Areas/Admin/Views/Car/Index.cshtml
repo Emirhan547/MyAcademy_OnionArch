@@ -1,76 +1,415 @@
 ﻿@using OnionApp.WebUI.Dtos.CarDtos
 @model List<ResultCarDto>
+
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Araç Listesi";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
     int count = 0;
 }
 
+<style>
+    :root {
+        --primary: #6366f1;
+        --primary-dark: #4338ca;
+        --success: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --info: #06b6d4;
+        --dark: #0f172a;
+        --gray: #64748b;
+        --border: #e2e8f0;
+        --surface: #ffffff;
+        --bg: #f8fafc;
+    }
+
+    body {
+        background: var(--bg);
+    }
+
+    .car-page-header {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        border-radius: 24px;
+        padding: 40px;
+        color: white;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(79, 70, 229, 0.18);
+    }
+
+        .car-page-header::before {
+            content: "";
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+            top: -120px;
+            right: -100px;
+        }
+
+        .car-page-header::after {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 50%;
+            bottom: -80px;
+            left: -60px;
+        }
+
+    .header-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .car-title {
+        font-size: 34px;
+        font-weight: 800;
+        margin-bottom: 12px;
+        color: white;
+    }
+
+    .car-subtitle {
+        font-size: 15px;
+        opacity: 0.92;
+        max-width: 720px;
+        line-height: 1.7;
+        margin-bottom: 0;
+    }
+
+    .top-actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .modern-btn {
+        border: none;
+        border-radius: 14px;
+        padding: 12px 22px;
+        font-size: 14px;
+        font-weight: 600;
+        transition: .25s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-primary-modern {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: white;
+        box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
+    }
+
+        .btn-primary-modern:hover {
+            transform: translateY(-2px);
+            color: white;
+            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.28);
+        }
+
+    .car-table-card {
+        background: white;
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid #eef2f7;
+        box-shadow: 0 10px 35px rgba(15, 23, 42, 0.05);
+    }
+
+    .table {
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+
+        .table thead {
+            background: #f8fafc;
+        }
+
+            .table thead th {
+                border: none;
+                padding: 20px 18px;
+                font-size: 13px;
+                text-transform: uppercase;
+                letter-spacing: .5px;
+                color: #64748b;
+                font-weight: 700;
+                white-space: nowrap;
+            }
+
+        .table tbody tr {
+            transition: .2s ease;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+            .table tbody tr:hover {
+                background: #f8fbff;
+            }
+
+        .table tbody td,
+        .table tbody th {
+            padding: 18px;
+            border: none;
+            vertical-align: middle;
+        }
+
+    .car-index {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: #eef2ff;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+    }
+
+    .brand-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: #f1f5f9;
+        color: #0f172a;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .km-badge {
+        padding: 8px 12px;
+        border-radius: 12px;
+        background: #ecfeff;
+        color: #0891b2;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .transmission-badge {
+        padding: 8px 12px;
+        border-radius: 12px;
+        background: #f5f3ff;
+        color: #7c3aed;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .action-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .table-action-btn {
+        border: none;
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 700;
+        transition: .2s ease;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+        .table-action-btn:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+
+    .btn-delete {
+        background: rgba(239, 68, 68, 0.12);
+        color: #dc2626;
+    }
+
+        .btn-delete:hover {
+            background: #ef4444;
+        }
+
+    .btn-update {
+        background: rgba(16, 185, 129, 0.12);
+        color: #059669;
+    }
+
+        .btn-update:hover {
+            background: #10b981;
+        }
+
+    .btn-detail {
+        background: rgba(15, 23, 42, 0.08);
+        color: #0f172a;
+    }
+
+        .btn-detail:hover {
+            background: #0f172a;
+        }
+
+    .btn-feature {
+        background: rgba(6, 182, 212, 0.12);
+        color: #0891b2;
+    }
+
+        .btn-feature:hover {
+            background: #06b6d4;
+        }
+
+    .btn-site {
+        background: rgba(245, 158, 11, 0.12);
+        color: #d97706;
+    }
+
+        .btn-site:hover {
+            background: #f59e0b;
+        }
+
+    .btn-price {
+        background: rgba(100, 116, 139, 0.12);
+        color: #475569;
+    }
+
+        .btn-price:hover {
+            background: #64748b;
+        }
+
+    @@media(max-width: 1200px) {
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .action-group {
+            min-width: 540px;
+        }
+    }
+
+    @@media(max-width: 768px) {
+        .car-page-header {
+            padding: 30px 24px;
+        }
+
+        .car-title {
+            font-size: 26px;
+        }
+
+        .top-actions {
+            justify-content: flex-start;
+        }
+    }
+</style>
 
 <div class="page-content">
     <div class="container-fluid">
 
-        <!-- start page title -->
-        <div class="row">
-            <div class="col-xl-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h4 class="card-title">Araba Listesi</h4>
-                        <p class="card-subtitle mb-4">
-                            Arabalarla ilgili ekleme, silme, güncelleme, arama ve listeleme gibi işlemleri bu sayfa üzerinden gerçekleştirebilirsiniz.
-                        </p>
-                        <div class="table-responsive">
-                            <table class="table mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Marka</th>
-                                        <th>Model</th>
-                                        <th>Vites Türü</th>
-                                        <th>Km</th>
-                                        <th>Sil</th>
-                                        <th>Güncelle</th>
-                                        <th>Detaylar</th>
-                                        <th>Özellik Ata</th>
-                                        <th>Sitede Gör</th>
-                                        <th>Fiyat Bilgileri</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var item in Model)
-                                    {
-                                        count++;
-                                        <tr>
-                                            <th scope="row">@count</th>
-                                            <td>@item.BrandName</td>
-                                            <td>@item.Model</td>
-                                            <td>@item.Transmission</td>
-                                            <td>@item.Km</td>
-                                            <td><a href="/Admin/Car/DeleteCar/@item.Id" class="btn btn-outline-danger">Sil</a></td>
-                                            <td><a href="/Admin/Car/UpdateCar/@item.Id" class="btn btn-outline-success">Güncelle</a></td>
-                                            <td><a href="/Admin/Car/CarDetail/@item.Id" class="btn btn-outline-dark">Detaylar</a></td>
-                                            <td><a href="/Admin/Car/CreateFeatureByCarId"/@item.Id class="btn btn-outline-info">Özellik Ata</a></td>
-                                            <td><a href="/Car/CarDetail/@item.Id" class="btn btn-outline-warning">Sitede Gör</a></td>
-                                            <td><a href="/CarPricing/Index/@item.Id" class="btn btn-outline-secondary">Fiyat Bilgileri</a></td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                            <a href="/Admin/Car/CreateCar/" class="btn btn-outline-primary">Yeni Araç Girişi</a>
-                        </div>
-
-                    </div>
-                    <!-- end card-body-->
-                </div>
-                <!-- end card -->
-
+        <div class="car-page-header">
+            <div class="header-content">
+                <h1 class="car-title">Araç Yönetim Paneli</h1>
+                <p class="car-subtitle">
+                    Sistemde kayıtlı araçları modern yönetim ekranı üzerinden görüntüleyebilir,
+                    güncelleyebilir, silebilir ve detay işlemlerini kolayca gerçekleştirebilirsiniz.
+                </p>
             </div>
-            <!-- end col -->
-
         </div>
-        <!-- end page title -->
 
-    </div> <!-- container-fluid -->
+        <div class="top-actions">
+            <a href="/Admin/Car/CreateCar/" class="modern-btn btn-primary-modern">
+                <i class="mdi mdi-plus-circle-outline"></i>
+                Yeni Araç Ekle
+            </a>
+        </div>
+
+        <div class="car-table-card">
+            <div class="table-responsive">
+                <table class="table align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Marka</th>
+                            <th>Model</th>
+                            <th>Vites</th>
+                            <th>Kilometre</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            count++;
+
+                            <tr>
+                                <th>
+                                    <div class="car-index">
+                                        @count
+                                    </div>
+                                </th>
+
+                                <td>
+                                    <span class="brand-badge">
+                                        @item.BrandName
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <strong>@item.Model</strong>
+                                </td>
+
+                                <td>
+                                    <span class="transmission-badge">
+                                        @item.Transmission
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="km-badge">
+                                        @item.Km KM
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <div class="action-group">
+
+                                        <a href="/Admin/Car/DeleteCar/@item.Id"
+                                           class="table-action-btn btn-delete">
+                                            <i class="mdi mdi-trash-can-outline"></i> Sil
+                                        </a>
+
+                                        <a href="/Admin/Car/UpdateCar/@item.Id"
+                                           class="table-action-btn btn-update">
+                                            <i class="mdi mdi-pencil-outline"></i> Güncelle
+                                        </a>
+
+                                        <a href="/Admin/Car/CarDetail/@item.Id"
+                                           class="table-action-btn btn-detail">
+                                            <i class="mdi mdi-information-outline"></i> Detay
+                                        </a>
+
+                                        <a href="/Admin/Car/CreateFeatureByCarId/@item.Id"
+                                           class="table-action-btn btn-feature">
+                                            <i class="mdi mdi-tune-variant"></i> Özellik
+                                        </a>
+
+                                        <a href="/Car/CarDetail/@item.Id"
+                                           class="table-action-btn btn-site">
+                                            <i class="mdi mdi-web"></i> Sitede Gör
+                                        </a>
+
+                                        <a href="/CarPricing/Index/@item.Id"
+                                           class="table-action-btn btn-price">
+                                            <i class="mdi mdi-cash-multiple"></i> Fiyat
+                                        </a>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+    </div>
 </div>
-
-

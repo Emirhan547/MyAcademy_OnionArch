@@ -1,71 +1,397 @@
 ﻿@using OnionApp.WebUI.Dtos.CarDtos
 @model CreateCarDto
+
 @{
-    ViewData["Title"] = "CreateCar";
+    ViewData["Title"] = "Yeni Araç Ekle";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
+<style>
+    :root {
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+        --primary-light: #eef2ff;
+        --success: #10b981;
+        --dark: #0f172a;
+        --gray: #64748b;
+        --border: #e2e8f0;
+        --surface: #ffffff;
+        --bg: #f8fafc;
+    }
+
+    body {
+        background: var(--bg);
+    }
+
+    .create-car-header {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        border-radius: 30px;
+        padding: 42px;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 45px rgba(79,70,229,.18);
+    }
+
+        .create-car-header::before {
+            content: "";
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.08);
+            top: -120px;
+            right: -90px;
+        }
+
+        .create-car-header::after {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.05);
+            left: -50px;
+            bottom: -70px;
+        }
+
+    .header-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .page-title {
+        color: white;
+        font-size: 38px;
+        font-weight: 800;
+        margin-bottom: 12px;
+    }
+
+    .page-subtitle {
+        color: rgba(255,255,255,.92);
+        font-size: 15px;
+        line-height: 1.8;
+        max-width: 850px;
+        margin-bottom: 0;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 30px;
+        border: 1px solid #edf2f7;
+        overflow: hidden;
+        box-shadow: 0 10px 35px rgba(15,23,42,.05);
+    }
+
+    .form-card-header {
+        padding: 28px 32px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .form-card-title {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 800;
+        color: var(--dark);
+    }
+
+    .form-badge {
+        background: var(--primary-light);
+        color: var(--primary);
+        padding: 10px 16px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .modern-form {
+        padding: 32px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
+        gap: 24px;
+    }
+
+    .form-group-modern {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-label-modern {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 10px;
+    }
+
+    .modern-input,
+    .modern-select {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 15px 18px;
+        font-size: 14px;
+        color: var(--dark);
+        background: #fff;
+        transition: .25s ease;
+        outline: none;
+        box-shadow: none;
+    }
+
+        .modern-input:focus,
+        .modern-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99,102,241,.10);
+        }
+
+    .full-width {
+        grid-column: 1 / -1;
+    }
+
+    .submit-area {
+        margin-top: 35px;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .submit-btn {
+        border: none;
+        border-radius: 18px;
+        padding: 15px 28px;
+        font-size: 15px;
+        font-weight: 700;
+        background: linear-gradient(135deg,#6366f1,#8b5cf6);
+        color: white;
+        transition: .25s ease;
+        box-shadow: 0 10px 25px rgba(99,102,241,.20);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 35px rgba(99,102,241,.28);
+        }
+
+    .input-info {
+        margin-top: 8px;
+        font-size: 12px;
+        color: var(--gray);
+    }
+
+    @@media(max-width:768px) {
+
+        .create-car-header {
+            padding: 30px 24px;
+        }
+
+        .page-title {
+            font-size: 30px;
+        }
+
+        .modern-form {
+            padding: 24px;
+        }
+
+        .form-card-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .submit-area {
+            justify-content: stretch;
+        }
+
+        .submit-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
 
 <div class="page-content">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-xl-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h4 class="card-title">Yeni Araç Girişi</h4>
-                        <p class="card-subtitle mb-4">Araç ile ilgili temel bilgileri eksiksiz doldurmanız önemlidir. Veri girişlerinden sonra kaydet butonuna tıklayarak işlemi tamamlayabilirsiniz.</p>
-                        <form method="post">
-                            <div class="form-group">
-                                <label for="exampleInputBrand">Marka</label>
-                                @Html.DropDownListFor(x => x.BrandId, (List<SelectListItem>)ViewBag.BrandValues, new { @class = "form-control" })
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleInputModel">Model</label>
-                                <input type="text" class="form-control" id="exampleInputModel" asp-for="Model" placeholder="Model Girişi Yapınız">
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleInputCoverImage">Kapak Fotoğrafı</label>
-                                <input type="text" class="form-control" id="exampleInputCoverImage" asp-for="CoverImageUrl" placeholder="Kapak Fotoğraf Linkini Giriniz">
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleInputKm">Km</label>
-                                <input type="text" class="form-control" id="exampleInputKm" asp-for="Km" placeholder="Km Bilgisi Giriniz">
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleInputTransmission">Vites Türü</label>
-                                <input type="text" class="form-control" id="exampleInputTransmission" asp-for="Transmission" placeholder="Vites Türünü Yazınız">
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleInputSeat">Koltuk Sayısı</label>
-                                <input type="number" class="form-control" id="exampleInputSeat" asp-for="Seat" placeholder="Koltuk Sayısını Seçiniz">
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleInputLuggage">Bagaj Sayısı</label>
-                                <input type="number" class="form-control" id="exampleInputLuggage" asp-for="Luggage" placeholder="Bagaj Sayısını Giriniz">
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleInputFuel">Yakıt Türü</label>
-                                <input type="text" class="form-control" id="exampleInputFuel" asp-for="Fuel" placeholder="Yakıt Türünü Giriniz">
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleInputLuggage">Büyük Kapak Fotoğrafı</label>
-                                <input type="text" class="form-control" id="exampleInputLuggage" asp-for="BigImageUrl" placeholder="Araç Detayında Gözükecek Kapak Fotoğraf Linki">
-                            </div>
-                            <button type="submit" class="btn btn-primary waves-effect waves-light">Aracı Kaydet</button>
-                        </form>
 
-                    </div> <!-- end card-body-->
-                </div>
+        <div class="create-car-header">
+
+            <div class="header-content">
+
+                <h1 class="page-title">
+                    Yeni Araç Oluştur
+                </h1>
+
+                <p class="page-subtitle">
+                    Araç ile ilgili tüm temel bilgileri eksiksiz şekilde doldurarak
+                    sisteme yeni araç kaydı oluşturabilirsiniz. Girilen bilgiler
+                    araç detay sayfasında ve rezervasyon ekranlarında görüntülenecektir.
+                </p>
 
             </div>
-            <!-- end card-body-->
+
         </div>
-        <!-- end card -->
+
+        <div class="form-card">
+
+            <div class="form-card-header">
+
+                <h3 class="form-card-title">
+                    Araç Bilgileri
+                </h3>
+
+                <span class="form-badge">
+                    Yeni Araç Kaydı
+                </span>
+
+            </div>
+
+            <form method="post" class="modern-form">
+
+                <div class="form-grid">
+
+                    <div class="form-group-modern">
+
+                        <label class="form-label-modern">
+                            Marka
+                        </label>
+
+                        @Html.DropDownListFor(x => x.BrandId,
+                                 (List<SelectListItem>)ViewBag.BrandValues,
+                                 new { @class = "modern-select" })
+
+                        <span class="input-info">
+                            Araç markasını seçiniz.
+                        </span>
+
+                    </div>
+
+                    <div class="form-group-modern">
+
+                        <label class="form-label-modern">
+                            Model
+                        </label>
+
+                        <input type="text"
+                               asp-for="Model"
+                               class="modern-input"
+                               placeholder="Örn: BMW 320i" />
+
+                    </div>
+
+                    <div class="form-group-modern full-width">
+
+                        <label class="form-label-modern">
+                            Kapak Fotoğrafı
+                        </label>
+
+                        <input type="text"
+                               asp-for="CoverImageUrl"
+                               class="modern-input"
+                               placeholder="Kapak fotoğrafı linkini giriniz" />
+
+                    </div>
+
+                    <div class="form-group-modern">
+
+                        <label class="form-label-modern">
+                            Kilometre
+                        </label>
+
+                        <input type="text"
+                               asp-for="Km"
+                               class="modern-input"
+                               placeholder="Örn: 45.000" />
+
+                    </div>
+
+                    <div class="form-group-modern">
+
+                        <label class="form-label-modern">
+                            Vites Türü
+                        </label>
+
+                        <input type="text"
+                               asp-for="Transmission"
+                               class="modern-input"
+                               placeholder="Örn: Otomatik" />
+
+                    </div>
+
+                    <div class="form-group-modern">
+
+                        <label class="form-label-modern">
+                            Koltuk Sayısı
+                        </label>
+
+                        <input type="number"
+                               asp-for="Seat"
+                               class="modern-input"
+                               placeholder="Koltuk sayısı" />
+
+                    </div>
+
+                    <div class="form-group-modern">
+
+                        <label class="form-label-modern">
+                            Bagaj Kapasitesi
+                        </label>
+
+                        <input type="number"
+                               asp-for="Luggage"
+                               class="modern-input"
+                               placeholder="Bagaj kapasitesi" />
+
+                    </div>
+
+                    <div class="form-group-modern">
+
+                        <label class="form-label-modern">
+                            Yakıt Türü
+                        </label>
+
+                        <input type="text"
+                               asp-for="Fuel"
+                               class="modern-input"
+                               placeholder="Örn: Dizel" />
+
+                    </div>
+
+                    <div class="form-group-modern full-width">
+
+                        <label class="form-label-modern">
+                            Büyük Kapak Fotoğrafı
+                        </label>
+
+                        <input type="text"
+                               asp-for="BigImageUrl"
+                               class="modern-input"
+                               placeholder="Detay sayfasında kullanılacak büyük görsel linki" />
+
+                    </div>
+
+                </div>
+
+                <div class="submit-area">
+
+                    <button type="submit"
+                            class="submit-btn">
+
+                        <i class="mdi mdi-content-save-outline"></i>
+                        Aracı Kaydet
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
 
     </div>
-    <!-- end col -->
-
 </div>
-<!-- end page title -->
-
-

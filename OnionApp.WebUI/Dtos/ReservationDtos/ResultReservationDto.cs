@@ -9,7 +9,7 @@
         public string Phone { get; set; }
         public int PickUpLocationId { get; set; }
         public int DropOffLocationId { get; set; }
-        public int CarID { get; set; }
+        public int CarId { get; set; }
         public int Age { get; set; }
         public int DriverLicenseYear { get; set; }
         public string Description { get; set; }

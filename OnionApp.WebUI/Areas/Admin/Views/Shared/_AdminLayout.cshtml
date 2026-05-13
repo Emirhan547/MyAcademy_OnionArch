@@ -1,5 +1,7 @@
 ﻿@{
     Layout = null;
+    var signalRReservationHubUrl = ViewContext.HttpContext.RequestServices.GetService<IConfiguration>()?["ApiSettings:SignalR:ReservationHubUrl"] ?? "/reservationhub";
+    var accessToken = User.Claims.FirstOrDefault(x => x.Type == "carbooktoken")?.Value ?? string.Empty;
 }
 
 <!DOCTYPE html>
@@ -40,22 +42,22 @@
                             <div class="dropdown-menu">
 
                                 <!-- item-->
-                                <a href="javascript:void(0);" class="dropdown-item notify-item">
+                            <a href="/Admin/Car/CreateCar/" class="dropdown-item notify-item">
                                     Yeni Araç Girişi
                                 </a>
 
                                 <!-- item-->
-                                <a href="javascript:void(0);" class="dropdown-item notify-item">
+                            <a href="/Admin/Brand/CreateBrand/" class="dropdown-item notify-item">
                                     Yeni Marka Girişi
                                 </a>
 
                                 <!-- item-->
-                                <a href="javascript:void(0);" class="dropdown-item notify-item">
+                            <a href="/Admin/Reservation/Index/" class="dropdown-item notify-item">
                                     Rezervasyonlar
                                 </a>
 
                                 <!-- item-->
-                                <a href="javascript:void(0);" class="dropdown-item notify-item">
+                            <a href="/Default/Index/" class="dropdown-item notify-item">
                                     Siteye Git
                                 </a>
                             </div>
@@ -88,8 +90,8 @@
                         <div class="dropdown d-inline-block">
                             <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <img class="" src="~/Admin/vertical/assets/images/flags/us.jpg" alt="Header Language" height="16">
-                                    <span class="d-none d-sm-inline-block ml-1">İngilizce</span>
+                            <img class="" src="~/Admin/vertical/assets/images/flags/turkey.png" alt="Header Language" height="16">
+                            <span class="d-none d-sm-inline-block ml-1">Türkçe</span>
                                     <i class="mdi mdi-chevron-down d-none d-sm-inline-block"></i>
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-right">
@@ -144,7 +146,7 @@
 </div>
                                                                 <div class="p-2 border-top">
                                                                     <a class="btn btn-sm btn-light btn-block text-center" href="javascript:void(0)">
-                                                                        <i class="mdi mdi-arrow-down-circle mr-1"></i> Load More..
+                                    <i class="mdi mdi-arrow-down-circle mr-1"></i> Daha Fazla Yükle
                                                                     </a>
                                                                 </div>
                                                             </div>
@@ -226,6 +228,7 @@
                                                                 <li><a href="/Admin/SocialMedia/Index/" class="waves-effect"><i class="fas fa-tv"></i><span>Sosyal Medya</span></a></li>
                                                                 <li><a href="/Admin/Testimonial/Index/" class="waves-effect"><i class="fas fa-people-carry"></i><span>Referanslar</span></a></li>
                                                                 <li><a href="/Admin/TagCloud/Index/" class="waves-effect"><i class="fas fa-hashtag"></i><span>Etiket Bulutu</span></a></li>
+                        <li><a href="/Admin/Reservation/Index/" class="waves-effect"><i class="fas fa-calendar-check"></i><span>Rezervasyonlar</span></a></li>
                                                                 <li><a href="#" class="waves-effect"><i class="fas fa-plug"></i><span>Ayarlar</span></a></li>
                                                                 <li><a href="#" class="waves-effect"><i class="fas fa-window-close"></i><span>Çıkış Yap</span></a></li>
                                                             </ul>
@@ -277,7 +280,9 @@
         const todayCount=document.getElementById('today-reservation-count');
         const setStatus=(t)=>{ if(status) status.textContent=t; };
         const renderItem=(n)=>`<a href="#" class="text-reset notification-item"><div class="media"><div class="avatar-xs mr-3"><span class="avatar-title bg-primary rounded-circle"><i class="mdi mdi-calendar"></i></span></div><div class="media-body"><h6 class="mt-0 mb-1">Yeni Rezervasyon #${n.reservationId}</h6><p class="font-size-12 mb-1">${n.fullName}</p><p class="font-size-12 mb-0 text-muted">${new Date(n.createdAtUtc).toLocaleString()}</p></div></div></a>`;
-        const connection=new signalR.HubConnectionBuilder().withUrl('/reservationhub').withAutomaticReconnect().build();
+        const reservationHubUrl='@signalRReservationHubUrl';
+        const accessToken='@accessToken';
+        const connection=new signalR.HubConnectionBuilder().withUrl(reservationHubUrl,{ accessTokenFactory:()=>accessToken }).withAutomaticReconnect().build();
         connection.on('ReceiveReservationCount', c=>{ if(badge) badge.textContent=c; });
         connection.on('ReceiveReservationCreated', n=>{ if(empty) empty.remove(); if(list) list.insertAdjacentHTML('afterbegin', renderItem(n)); if(todayCount){ const cur=parseInt((todayCount.textContent||'0').replace(/\D/g,''))||0; todayCount.textContent='# '+(cur+1);} });
         connection.onreconnecting(()=>setStatus('Yeniden bağlanıyor...'));
